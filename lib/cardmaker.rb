@@ -1,4 +1,3 @@
-require 'rmagick'
 require 'google_drive'
 require_relative 'read_worksheet'
 require_relative 'render_card'
@@ -15,6 +14,13 @@ unless (file = session.file_by_title(docname))
   raise "File #{docname} not found!" 
 end
 
+cards = {}
 file.worksheets.each do |ws|
-  p read_worksheet(ws)
+  cards = cards.merge(read_worksheet(ws))
+end
+
+cards.each do |title, card|
+  card.each do |t, c|
+    render_card(c)
+  end
 end

@@ -1,0 +1,45 @@
+globals:
+  border: '#000'
+
+aspects:
+  n:
+    name: anger
+    color:
+      base: '#b00'
+      text: '#000'
+
+  a:
+    name: apathy
+    color:
+      base: '#777'
+      text: '#000'
+
+  e:
+    name: entropy
+    color:
+      base: '#5f0055'
+      text: '#FFF'
+
+  g:
+    name: greed
+    color:
+      base: '#333'
+      text: '#FFF'
+
+  o:
+    name: order
+    color:
+      base: '#efa200'
+      text: '#000'
+
+  p:
+    name: pride
+    color:
+      base: '#005620'
+      text: '#FFF'
+
+  c:
+    name: colorless
+    color:
+      base: '#FFF'
+      text: '#000'
