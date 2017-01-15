@@ -1,3 +1,4 @@
-output/
+output/*
 config.json
 *.swp
+!*.gitkeep
