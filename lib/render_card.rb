@@ -48,10 +48,40 @@ class CardRenderer
   private
     # Draws a card to image
     def draw(image, card) 
+      drawHash = {};
+
       @fields.each do |name, field|
         d = Draw.new
         d.interline_spacing = -5
         color = field['color']
+        drawHash[name] = d
+        pos = {}
+
+        # relative fields
+        {'x' => 'width', 'y' => 'height'}.each do |a, b|
+          attribute = field[a]
+          pos[a] = 0
+
+          while (!attribute.is_a?(Numeric))
+            o, f = attribute.split('.')
+            attribute = @fields[o][f]
+
+            if (@fields[o]['type'] == 'text')
+              unless (card[o].nil?)
+                broken_text = break_text(
+                  (field['sizex']*@dpi).floor,
+                  card[o],
+                  drawHash[o]
+                )
+                pos[a] += drawHash[o].get_multiline_type_metrics(broken_text)[b]
+              end
+            else
+              pos[a] += @fields[o]['size' + f]*@dpi
+            end
+          end
+
+          pos[a] += (attribute*@dpi).floor
+        end
 
         # default color
         unless (aspect = card['aspect'])      
@@ -70,15 +100,15 @@ class CardRenderer
           d.rotate(field['rotate'])
           d.translate(
             *rotate_coords(
-              (field['x']*@dpi).floor,
-              (field['y']*@dpi).floor,
+              pos['x'],
+              pos['y'],
               -field['rotate']
             )
           )
         else
           d.translate(
-            (field['x']*@dpi).floor,
-            (field['y']*@dpi).floor
+            pos['x'],
+            pos['y'],
           )
         end
 

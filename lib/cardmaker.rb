@@ -20,8 +20,9 @@ file.worksheets.each do |ws|
 end
 
 r = CardRenderer.new('/colors.yaml', '/cardlayout.yaml', '../output/')
+
 cards.each do |title, card|
-  print "#{title} ======\n"
+  print "\n#{title} ======\n"
 
   card.each do |t, c|
     print "#{t}\n"
