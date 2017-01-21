@@ -83,7 +83,7 @@ layout:
       type: text
       x: 0.3
       y: 2.0
-      sizex: 1.8
+      sizex: 1.85
       sizey: 2.1
       color: text
 

@@ -170,9 +170,7 @@ class CardRenderer
       t = text.split(' ')
 
       t.each_with_index do |word, i|
-        if (i == t.size - 1) 
-          result << line + word
-        elsif (draw.get_type_metrics(line + ' ' + word).width > width)
+        if (draw.get_type_metrics(line + ' ' + word).width > width)
           result << line
           line = word
         else
@@ -182,6 +180,10 @@ class CardRenderer
         if (i != t.size - 1)
           line += ' '
         end
+      end
+
+      unless (line.empty?)
+        result << line
       end
 
       return result.join("\n")
