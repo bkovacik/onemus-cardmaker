@@ -122,7 +122,7 @@ layout:
     equipment:
       type: text
       x: 0.5
-      y: 3.2
+      y: 3.1
       sizex: 1.0
       sizey: 2.1
       color: text

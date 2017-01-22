@@ -3,16 +3,18 @@ require 'yaml'
 include Magick
 
 class CardRenderer
-  
-
   # Args[0] = colors
   # Args[1] = layout
-  # Args[2] = outdir
+  # Args[2] = cardList
+  # Args[3] = outdir
   def initialize(*args)
     confdir = File.expand_path('../config', File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args[0])
     @layout = YAML.load_file(confdir + args[1])['layout']
-    @outdir = args[2]
+    @cardList = YAML.load_file(confdir + args[2])
+    @outdir = args[3]
+
+    @imageCache = {}
 
     @dpi = @layout['dpi']
 
@@ -43,6 +45,26 @@ class CardRenderer
 
     outpath = File.expand_path(@outdir + name, File.dirname(__FILE__))
     c.write(outpath)
+  end
+
+  def render_cardlist(name)
+    imageList = ImageList.new
+
+    index = 0
+    @cardList['cards'].each do |card|
+      (1..card['copies']).each do |copy|
+        if (@imageCache[card['name']].nil?)
+          raise "No image for card #{card['name']} found!"
+        end
+
+        imageList << @imageCache[card['name']]
+      end
+    end
+
+    imageList.montage{
+      self.geometry = "200x280+2+2"
+      self.tile = "4x4"
+    }.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
 
   private
@@ -149,6 +171,8 @@ class CardRenderer
 
         d.draw(image)
       end
+
+      @imageCache[card['name']] = image
     end
 
     # Rotates provided coords by deg
@@ -189,9 +213,3 @@ class CardRenderer
       return result.join("\n")
     end
 end
-
-
-
-
-
-

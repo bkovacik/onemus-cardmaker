@@ -20,7 +20,7 @@ file.worksheets.each do |ws|
   cards = cards.merge(symbol_replace(read_worksheet(ws)))
 end
 
-r = CardRenderer.new('/colors.yaml', '/cardlayout.yaml', '../output/')
+r = CardRenderer.new('/colors.yaml', '/cardlayout.yaml', '/cardlist.yaml', '../output/')
 
 cards.each do |title, card|
   print "\n#{title} ======\n"
@@ -31,3 +31,5 @@ cards.each do |title, card|
     r.render_card(c)
   end
 end
+
+r.render_cardlist('/output/output.png')

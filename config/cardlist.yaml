@@ -1,0 +1,319 @@
+cards:
+  - name: "Terrezork"
+    copies: 1
+
+  - name: "Malashk"
+    copies: 1
+
+  - name: "Stormgear"
+    copies: 1
+
+  - name: "Yaw"
+    copies: 1
+
+  - name: "Gerrick"
+    copies: 1
+
+  - name: "Zzrech"
+    copies: 1
+
+  - name: "Oglin"
+    copies: 1
+
+  - name: "Bloodraiser"
+    copies: 1
+
+  - name: "Berserker"
+    copies: 1
+
+  - name: "Slayer"
+    copies: 1
+
+  - name: "Magmaguana"
+    copies: 1
+
+  - name: "Megamite"
+    copies: 1
+
+  - name: "Technomancer"
+    copies: 1
+
+  - name: "Maer Guardian"
+    copies: 1
+
+  - name: "Nulifier"
+    copies: 1
+
+  - name: "Colossus"
+    copies: 1
+
+  - name: "Turglid"
+    copies: 1
+
+  - name: "Void Knight"
+    copies: 1
+
+  - name: "Rift Raider"
+    copies: 1
+
+  - name: "Ythog"
+    copies: 1
+
+  - name: "Rift Trawler"
+    copies: 1
+
+  - name: "Zombie"
+    copies: 1
+
+  - name: "Gargoyle"
+    copies: 1
+
+  - name: "Acolyte"
+    copies: 1
+
+  - name: "Gorgon"
+    copies: 1
+
+  - name: "Flesh Golem"
+    copies: 1
+
+  - name: "Man at Arms"
+    copies: 1
+
+  - name: "Stormbow"
+    copies: 1
+
+  - name: "Cleric"
+    copies: 1
+
+  - name: "Iron Warden"
+    copies: 1
+
+  - name: "King's Guard"
+    copies: 1
+
+  - name: "Spider Rider"
+    copies: 1
+
+  - name: "Redclaws"
+    copies: 1
+
+  - name: "Badger Druid"
+    copies: 1
+
+  - name: "Oglogasaur"
+    copies: 1
+
+  - name: "King of the Jungle"
+    copies: 1
+
+  - name: "Hill"
+    copies: 2
+
+  - name: "Tundra"
+    copies: 2
+
+  - name: "Tower"
+    copies: 2
+
+  - name: "Chasm"
+    copies: 2
+
+  - name: "Plateau"
+    copies: 2
+
+  - name: "Shrubland"
+    copies: 2
+
+  - name: "Summoning Platform"
+    copies: 2
+
+  - name: "Chroma Well"
+    copies: 2
+
+  - name: "Sanctum"
+    copies: 2
+
+  - name: "Fire Lands"
+    copies: 2
+
+  - name: "Void Shrine"
+    copies: 2
+
+  - name: "Victory Shrine"
+    copies: 2
+
+  - name: "Oracle Shrine"
+    copies: 2
+
+  - name: "Windfall"
+    copies: 2
+
+  - name: "Tunnel"
+    copies: 3
+
+  - name: "Disruptor"
+    copies: 6
+
+  - name: "Lieutenant"
+    copies: 6
+
+  - name: "Brute"
+    copies: 6
+
+  - name: "Aegis"
+    copies: 6
+
+  - name: "Bounty Hunter"
+    copies: 6
+
+  - name: "Rampaging Tunnel Worm"
+    copies: 1
+
+  - name: "Wraith"
+    copies: 1
+
+  - name: "Revenant"
+    copies: 1
+
+  - name: "Apprentice"
+    copies: 1
+
+  - name: "Tuskil"
+    copies: 1
+
+  - name: "Ant Mill"
+    copies: 1
+
+  - name: "Locust Shaman"
+    copies: 1
+
+  - name: "Corruptor"
+    copies: 2
+
+  - name: "Guard Tower"
+    copies: 2
+
+  - name: "Wandering Monk"
+    copies: 1
+
+  - name: "Longsword"
+    copies: 6
+
+  - name: "Greatsword"
+    copies: 6
+
+  - name: "Scout's Prerogative"
+    copies: 6
+
+  - name: "Studded Leather"
+    copies: 6
+
+  - name: "Platemail"
+    copies: 6
+
+  - name: "Chromatic Orb"
+    copies: 6
+
+  - name: "Staff of the Master"
+    copies: 6
+
+  - name: "Static Field"
+    copies: 1
+
+  - name: "Auto Salvager"
+    copies: 1
+
+  - name: "Soul Link"
+    copies: 2
+
+  - name: "Spiked Gauntlets"
+    copies: 2
+
+  - name: "Oath of the Undying"
+    copies: 1
+
+  - name: "Rending Claws"
+    copies: 2
+
+  - name: "Razor Hide"
+    copies: 1
+
+  - name: "Void Blade"
+    copies: 1
+
+  - name: "Cutter"
+    copies: 1
+
+  - name: "Chopper"
+    copies: 1
+
+  - name: "Lucky Coin"
+    copies: 1
+
+  - name: "Tesla Cannon"
+    copies: 1
+
+  - name: "Angel's Breath"
+    copies: 1
+
+  - name: "Magic Missile"
+    copies: 12
+
+  - name: "Place Terrain"
+    copies: 12
+
+  - name: "Harmonize"
+    copies: 12
+
+  - name: "Warp Summon"
+    copies: 12
+
+  - name: "Block"
+    copies: 12
+
+  - name: "Blessing"
+    copies: 12
+
+  - name: "Aether Wings"
+    copies: 12
+
+  - name: "Summoning Stone"
+    copies: 12
+
+  - name: "Frenzy"
+    copies: 12
+
+  - name: "Tectonic Shift"
+    copies: 12
+
+  - name: "Scorched Earth"
+    copies: 1
+
+  - name: "Warcry"
+    copies: 2
+
+  - name: "Life Drain"
+    copies: 2
+
+  - name: "Unearth"
+    copies: 2
+
+  - name: "Evolve"
+    copies: 2
+
+  - name: "Dimensional Break"
+    copies: 2
+
+  - name: "Aether Storm"
+    copies: 2
+
+  - name: "Power Up"
+    copies: 2
+
+  - name: "Shield Bash"
+    copies: 2
+
+  - name: "Hold the Line"
+    copies: 2
+
