@@ -1,7 +1,8 @@
 layout:
-  dpi: 80
+  dpi: 150
   x: 2.5
   y: 3.5
+  font: Livingst
 
   fields:
     border:
@@ -24,11 +25,12 @@ layout:
 
     name:
       type: text
-      x: 0.2
-      y: 0.25
+      x: 0.35
+      y: 0.3
       sizex: 2.1
       sizey: 0.2
       color: text
+      textsize: 0.2
 
     title:
       type: text

@@ -2,6 +2,9 @@ require 'rmagick'
 require 'yaml'
 include Magick
 
+DEFAULT_TEXT_SIZE = 0.15
+FONT_DIR = 'C:/Windows/Fonts/'
+
 class CardRenderer
   # Args[0] = colors
   # Args[1] = layout
@@ -23,13 +26,16 @@ class CardRenderer
     @globals = @colors['globals']
 
     @fields = @layout['fields'] 
+
+    @cardX = (@layout['x'] * @dpi).floor
+    @cardY = (@layout['y'] * @dpi).floor
   end
 
   # Takes in a hash representing a card and outputs an image to the outputs directory
   def render_card(card)
     c = Image.new(
-      (@layout['x'] * @dpi).floor,
-      (@layout['y'] * @dpi).floor
+      @cardX,
+      @cardY
     ) {
       self.background_color = 'transparent'
       self.format = 'png'
@@ -62,8 +68,8 @@ class CardRenderer
     end
 
     imageList.montage{
-      self.geometry = "200x280+2+2"
-      self.tile = "4x4"
+      self.geometry = "#{@cardX}x#{@cardY}+2+2"
+      self.tile = "3x3"
     }.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
 
@@ -74,10 +80,26 @@ class CardRenderer
 
       @fields.each do |name, field|
         d = Draw.new
-        d.interline_spacing = -5
         color = field['color']
         drawHash[name] = d
         pos = {}
+
+        if (field['type'] == 'text')
+          d.interline_spacing = -5
+          d.pointsize = field['textsize'].nil? ?
+            DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
+        end
+
+        d.fill = @globals[color].nil? ?
+          @aspects[card['aspect']]['color'][color] : @globals[color]
+        font = FONT_DIR +
+          (field['font'].nil? @layout['font'] : field['font']) +
+          '.ttf'
+        unless File.file?(font)
+          raise "#{font} not found!"
+        else
+          d.font = font 
+        end
 
         # relative fields
         {'x' => 'width', 'y' => 'height'}.each do |a, b|
@@ -108,13 +130,6 @@ class CardRenderer
         # default color
         unless (aspect = card['aspect'])      
           card['aspect'] = 'c'
-        end
-
-        # fill
-        unless (@globals[color].nil?)
-          d.fill = @globals[color] 
-        else
-          d.fill = @aspects[card['aspect']]['color'][color]
         end
 
         # rotate
