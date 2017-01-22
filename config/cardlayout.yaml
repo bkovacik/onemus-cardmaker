@@ -121,8 +121,8 @@ layout:
 
     equipment:
       type: text
-      x: 1.0
-      y: 3.3
-      sizex: 1.8
+      x: 0.5
+      y: 3.2
+      sizex: 1.0
       sizey: 2.1
       color: text

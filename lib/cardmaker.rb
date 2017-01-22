@@ -1,6 +1,7 @@
 require 'google_drive'
 require_relative 'read_worksheet'
 require_relative 'render_card'
+require_relative 'symbol_replace'
 
 if (ARGV.empty?)
   raise "Usage: (ruby) cardmaker(.rb) [GOOGLE DRIVE FILENAME]\n #{ARGV.length}"
@@ -16,7 +17,7 @@ end
 
 cards = {}
 file.worksheets.each do |ws|
-  cards = cards.merge(read_worksheet(ws))
+  cards = cards.merge(symbol_replace(read_worksheet(ws)))
 end
 
 r = CardRenderer.new('/colors.yaml', '/cardlayout.yaml', '../output/')
