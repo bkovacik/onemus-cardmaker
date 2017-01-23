@@ -2,7 +2,7 @@ layout:
   dpi: 150
   x: 2.5
   y: 3.5
-  font: Livingst
+  font: OLDSH__
 
   fields:
     border:
@@ -28,33 +28,31 @@ layout:
       x: 0.35
       y: 0.3
       sizex: 2.1
-      sizey: 0.2
       color: text
       textsize: 0.2
+      font: Livingst
 
     title:
       type: text
       x: 0.2
       y: 0.4
       sizex: 2.1
-      sizey: 0.2
       color: text
 
     class:
       type: text 
-      x: 0.3 
-      y: 0.8
-      sizex: 0.2
-      sizey: 2.1
+      x: 0.3
+      y: 1.4
+      sizex: 0.8
       color: text
       rotate: 270
+      align: right
 
     chroma_ability:
       type: text 
       x: 0.3 
       y: 1.4
       sizex: 2.0
-      sizey: 2.1
       color: text
 
     ability_1:
@@ -62,7 +60,7 @@ layout:
       x: 0.3 
       y: 1.5
       sizex: 1.8
-      sizey: 2.1
+      sizey: 1.6
       color: text
       
     ability_2:
@@ -70,15 +68,16 @@ layout:
       x: 0.3 
       y: ability_1.y
       sizex: 1.8
-      sizey: 2.1
+      sizey: 1.6
       color: text
+      align: right
     
     ability_3:
       type: text 
       x: 0.3 
       y: ability_2.y
       sizex: 1.8
-      sizey: 2.1
+      sizey: 1.6
       color: text
 
     ability:
@@ -86,7 +85,7 @@ layout:
       x: 0.3
       y: 2.0
       sizex: 1.85
-      sizey: 2.1
+      sizey: 1.4
       color: text
 
     attack:
@@ -94,7 +93,6 @@ layout:
       x: 2.0
       y: 3.3
       sizex: 1.8
-      sizey: 2.1
       color: text
 
     hp:
@@ -102,7 +100,6 @@ layout:
       x: 2.2
       y: 3.3
       sizex: 1.8
-      sizey: 2.1
       color: text
 
     cost:
@@ -110,7 +107,6 @@ layout:
       x: 0.2
       y: 0.5
       sizex: 1.8
-      sizey: 2.1
       color: text
 
     units:
@@ -118,7 +114,6 @@ layout:
       x: 1.7
       y: 3.3
       sizex: 1.8
-      sizey: 2.1
       color: text
 
     equipment:
@@ -126,5 +121,4 @@ layout:
       x: 0.5
       y: 3.1
       sizex: 1.0
-      sizey: 2.1
       color: text

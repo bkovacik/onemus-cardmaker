@@ -32,4 +32,4 @@ cards.each do |title, card|
   end
 end
 
-r.render_cardlist('/output/output.png')
+#r.render_cardlist('/output/output.png')

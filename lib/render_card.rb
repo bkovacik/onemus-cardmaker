@@ -83,23 +83,26 @@ class CardRenderer
         color = field['color']
         drawHash[name] = d
         pos = {}
+        fontsize = 0
 
         if (field['type'] == 'text')
           d.interline_spacing = -5
-          d.pointsize = field['textsize'].nil? ?
+          fontsize = field['textsize'].nil? ?
             DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
+          d.pointsize = fontsize
         end
 
         d.fill = @globals[color].nil? ?
           @aspects[card['aspect']]['color'][color] : @globals[color]
         font = FONT_DIR +
-          (field['font'].nil? @layout['font'] : field['font']) +
+          (field['font'].nil? ? @layout['font'] : field['font']) +
           '.ttf'
         unless File.file?(font)
           raise "#{font} not found!"
         else
           d.font = font 
         end
+        unless field['align'].nil? then d.align = to_constant(field['align']) end
 
         # relative fields
         {'x' => 'width', 'y' => 'height'}.each do |a, b|
@@ -112,12 +115,12 @@ class CardRenderer
 
             if (@fields[o]['type'] == 'text')
               unless (card[o].nil?)
-                broken_text = break_text(
+                bt = break_text(
                   (field['sizex']*@dpi).floor,
                   card[o],
                   drawHash[o]
                 )
-                pos[a] += drawHash[o].get_multiline_type_metrics(broken_text)[b]
+                pos[a] += drawHash[o].get_multiline_type_metrics(bt)[b]
               end
             else
               pos[a] += @fields[o]['size' + f]*@dpi
@@ -149,6 +152,14 @@ class CardRenderer
           )
         end
 
+        # compensate for text-align
+        case field['align']
+        when 'center'
+          d.translate((field['sizex']*@dpi/2), 0)
+        when 'right'
+          d.translate((field['sizex']*@dpi).floor, 0)
+        end
+
         case field['type']
         when 'rounded'
           d.roundrectangle(
@@ -168,6 +179,16 @@ class CardRenderer
           )
         when 'text'
           unless (card[name].nil?)
+# scale down
+unless (field['sizey'].nil? or field['sizex'].nil?)
+  m = d.get_type_metrics(card[name])
+  scale = m.width*m.height/field['sizex']/@dpi
+  y = field['sizey']*@dpi
+  if (scale > y)
+    fontsize *= y/scale
+    d.pointsize = fontsize 
+  end
+end
             d.text(
               0,
               0,
@@ -226,5 +247,18 @@ class CardRenderer
       end
 
       return result.join("\n")
+    end
+
+    # Reverse maps strings to RMagick constants
+    # Returns the RMagick constant
+    def to_constant(str)
+      case str
+      when 'left'
+        return LeftAlign
+      when 'right'
+        return RightAlign
+      when 'center'
+        return CenterAlign
+      end
     end
 end
