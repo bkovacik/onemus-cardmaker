@@ -111,7 +111,7 @@ layout:
 
     units:
       type: text
-      x: 1.7
+      x: 0.2
       y: 3.3
       sizex: 1.8
       color: text
@@ -122,3 +122,12 @@ layout:
       y: 3.1
       sizex: 1.0
       color: text
+
+    icon:
+      type: icon
+      x: 1.5
+      y: 1.5
+      image: blah.png
+      color: none
+      sizex: 0.32
+      sizey: 0.32

@@ -1,5 +1,6 @@
 globals:
   border: '#000'
+  none: '#0000'
 
 aspects:
   n:

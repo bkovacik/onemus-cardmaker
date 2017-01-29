@@ -9,13 +9,15 @@ class CardRenderer
   # Args[0] = colors
   # Args[1] = layout
   # Args[2] = cardList
-  # Args[3] = outdir
+  # Args[3] = images
+  # Args[4] = outdir
   def initialize(*args)
     confdir = File.expand_path('../config', File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args[0])
     @layout = YAML.load_file(confdir + args[1])['layout']
     @cardList = YAML.load_file(confdir + args[2])
-    @outdir = args[3]
+    @images = args[3]
+    @outdir = args[4]
 
     @imageCache = {}
 
@@ -83,84 +85,148 @@ class CardRenderer
         color = field['color']
         drawHash[name] = d
         pos = {}
-        fontsize = 0
 
-        if (field['type'] == 'text')
-          d.interline_spacing = -5
-          fontsize = field['textsize'].nil? ?
-            DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
-          d.pointsize = fontsize
-        end
-
-        d.fill = @globals[color].nil? ?
-          @aspects[card['aspect']]['color'][color] : @globals[color]
-        font = FONT_DIR +
-          (field['font'].nil? ? @layout['font'] : field['font']) +
-          '.ttf'
-        unless File.file?(font)
-          raise "#{font} not found!"
-        else
-          d.font = font 
-        end
-        unless field['align'].nil? then d.align = to_constant(field['align']) end
-
-        # relative fields
-        {'x' => 'width', 'y' => 'height'}.each do |a, b|
-          attribute = field[a]
-          pos[a] = 0
-
-          while (!attribute.is_a?(Numeric))
-            o, f = attribute.split('.')
-            attribute = @fields[o][f]
-
-            if (@fields[o]['type'] == 'text')
-              unless (card[o].nil?)
-                bt = break_text(
-                  (field['sizex']*@dpi).floor,
-                  card[o],
-                  drawHash[o]
-                )
-                pos[a] += drawHash[o].get_multiline_type_metrics(bt)[b]
-              end
-            else
-              pos[a] += @fields[o]['size' + f]*@dpi
-            end
-          end
-
-          pos[a] += (attribute*@dpi).floor
-        end
-
-        # default color
-        unless (aspect = card['aspect'])      
-          card['aspect'] = 'c'
-        end
-
-        # rotate
-        unless (field['rotate'].nil?)
-          d.rotate(field['rotate'])
-          d.translate(
-            *rotate_coords(
-              pos['x'],
-              pos['y'],
-              -field['rotate']
-            )
-          )
-        else
-          d.translate(
-            pos['x'],
-            pos['y'],
-          )
-        end
-
-        # compensate for text-align
-        case field['align']
-        when 'center'
-          d.translate((field['sizex']*@dpi/2), 0)
-        when 'right'
-          d.translate((field['sizex']*@dpi).floor, 0)
-        end
+        # defaults
+        unless (aspect = card['aspect']) then card['aspect'] = 'c' end
+        unless field['rotate'] then field['rotate'] = 0 end
 
         case field['type']
+        when 'rounded', 'rect'
+          draw_shape(name, field, image, card, drawHash, field['type'])
+        when 'text'
+          draw_text(name, field, image, card, drawHash)
+        when 'icon', 'image'
+          draw_image(name, field, image, card, drawHash)
+        else
+          raise "Invalid type field for #{name}!"
+        end
+      end
+
+      @imageCache[card['name']] = image
+    end
+
+    # Rotates provided coords by deg
+    # Returns [x', y']
+    def rotate_coords(x, y, deg)
+      d = deg * Math::PI / 180
+
+      return [
+        x*Math.cos(d) - y*Math.sin(d),
+        x*Math.sin(d) + y*Math.cos(d)
+      ]
+    end
+
+    # Draws image on image
+    def draw_image(name, field, image, card, drawHash)
+      imagepath = @images + field['image']
+      temp = Image.read(imagepath).first
+
+      imageinfo = Image.ping(imagepath).first
+      size = {}
+      size['x'] = imageinfo.columns
+      size['y'] = imageinfo.rows
+
+      # Resize if size values are present
+      ['x', 'y'].each do |a|
+        if (field['size' + a]) 
+          size[a] = field['size' + a]*@dpi
+        else
+          field['size' + a] = size[a]/@dpi
+        end
+      end
+
+      temp.resize!(size['x'], size['y'])
+
+      pos = relative_to_value(drawHash, field, card)
+
+      # Draw rect to image as placeholder
+      draw_shape(name, field, image, card, drawHash, 'rect')      
+
+      rotate_image(field, temp)
+
+      r = Math.sin(45*Math::PI/180)*size.values.min
+      rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
+
+      adjust_size!(size, field['rotate'])
+
+      image.composite!(
+        temp,
+        pos['x'] - size['x']/2 + r*Math.cos(rad),
+        pos['y'] - size['y']/2 + r*Math.sin(rad),
+        OverCompositeOp
+      )
+    end
+
+    # Draws text on image
+    def draw_text(name, field, image, card, drawHash)
+      color = field['color']
+      d = Draw.new
+      drawHash[name] = d
+      d.interline_spacing = -5
+      fontsize = field['textsize'].nil? ?
+        DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
+      d.pointsize = fontsize
+
+      font = FONT_DIR +
+        (field['font'].nil? ? @layout['font'] : field['font']) +
+        '.ttf'
+      unless File.file?(font)
+        raise "#{font} not found!"
+      else
+        d.font = font 
+      end
+      unless field['align'].nil? then d.align = to_constant(field['align']) end
+
+      pos = relative_to_value(drawHash, field, card)
+
+      rotate_drawing(field, d, pos)
+
+      # compensate for text-align
+      case field['align']
+      when 'center'
+        d.translate((field['sizex']*@dpi/2), 0)
+      when 'right'
+        d.translate((field['sizex']*@dpi).floor, 0)
+      end
+
+      if (card[name])
+        # scale down
+        if (field['sizey'] and field['sizex'])
+          m = d.get_type_metrics(card[name])
+          scale = m.width*m.height/field['sizex']/@dpi
+          y = field['sizey']*@dpi
+          if (scale > y)
+            fontsize *= y/scale
+            d.pointsize = fontsize 
+          end
+        end
+        d.text(
+          0,
+          0,
+          break_text(
+            (field['sizex']*@dpi).floor,
+            card[name],
+            d
+          )
+        )
+      end
+
+      d.draw(image)
+    end
+
+    # Draws shape on image
+    def draw_shape(name, field, image, card, drawHash, shape)
+      color = field['color']
+      d = Draw.new
+      drawHash[name] = d
+      d.fill = @globals[color].nil? ?
+        @aspects[card['aspect']]['color'][color] : @globals[color]
+
+      pos = relative_to_value(drawHash, field, card)
+
+      rotate_drawing(field, d, pos)
+
+      case shape
         when 'rounded'
           d.roundrectangle(
             0,
@@ -177,49 +243,86 @@ class CardRenderer
             (field['sizex']*@dpi).floor,
             (field['sizey']*@dpi).floor,
           )
-        when 'text'
-          unless (card[name].nil?)
-# scale down
-unless (field['sizey'].nil? or field['sizex'].nil?)
-  m = d.get_type_metrics(card[name])
-  scale = m.width*m.height/field['sizex']/@dpi
-  y = field['sizey']*@dpi
-  if (scale > y)
-    fontsize *= y/scale
-    d.pointsize = fontsize 
-  end
-end
-            d.text(
-              0,
-              0,
-              break_text(
-                (field['sizex']*@dpi).floor,
-                card[name],
-                d
-              )
-            )
-          else
-            next
-          end
-        else
-          raise "Invalid type field for #{name}!"
-        end
-
-        d.draw(image)
       end
 
-      @imageCache[card['name']] = image
+      d.draw(image)
     end
 
-    # Rotates provided coords by deg
-    # Returns [x', y']
-    def rotate_coords(x, y, deg)
-      d = deg * Math::PI / 180
+    # Rotates drawing and translates coordinates back to "normal"
+    def rotate_drawing(field, d, pos)
+      if (field['rotate'])
+        d.rotate(field['rotate'])
+        d.translate(
+          *rotate_coords(
+            pos['x'],
+            pos['y'],
+            -field['rotate']
+          )
+        )
+      else
+        d.translate(
+          pos['x'],
+          pos['y'],
+        )
+      end
+    end
 
-      return [
-        x*Math.cos(d) - y*Math.sin(d),
-        x*Math.sin(d) + y*Math.cos(d)
-      ]
+    # Rotates image
+    def rotate_image(field, image)
+      if (field['rotate'])
+        image.background_color = 'none'
+        image.rotate!(field['rotate'])
+      end
+    end
+
+    # Traverses relative fields and calculates the correct position
+    # Returns the value calculated
+    def relative_to_value(drawHash, field, card)
+      pos = {}
+      {'x' => 'width', 'y' => 'height'}.each do |a, b|
+        attribute = field[a]
+        pos[a] = 0
+
+        while (!attribute.is_a?(Numeric))
+          o, f = attribute.split('.')
+          attribute = @fields[o][f]
+
+          if (@fields[o]['type'] == 'text')
+            if (card[o])
+              bt = break_text(
+                (field['sizex']*@dpi).floor,
+                card[o],
+                drawHash[o]
+              )
+
+              pos[a] += drawHash[o].get_multiline_type_metrics(bt)[b]
+            end
+          else
+            pos[a] += @fields[o]['size' + f]*@dpi
+          end
+        end
+
+        pos[a] += (attribute*@dpi).floor
+      end
+
+      return pos
+    end
+
+    # Adjusts size to compensate for the resize from rotate_image
+    # Mutates size[x] and size[y]
+    def adjust_size!(size, rotate)
+      unless (rotate) then return end
+
+      if (rotate % 180 > 90)
+        size['x'], size['y'] = size['y'], size['x']
+      end
+
+      rotate %= 90
+      rotate *= Math::PI/180
+
+      ['x', 'y'].each do |a|
+        size[a] *= Math.sin(rotate) + Math.cos(rotate)
+      end
     end
 
     # Breaks text based on the given width
