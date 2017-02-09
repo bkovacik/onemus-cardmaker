@@ -70,8 +70,7 @@ layout:
       sizex: 1.8
       sizey: 1.6
       color: text
-      align: right
-    
+
     ability_3:
       type: text 
       x: 0.3 
@@ -81,12 +80,13 @@ layout:
       color: text
 
     ability:
-      type: text
+      type: combined
       x: 0.3
       y: 2.0
       sizex: 1.85
-      sizey: 1.4
+      sizey: 1.2
       color: text
+      align: center
 
     attack:
       type: text 
@@ -115,19 +115,3 @@ layout:
       y: 3.3
       sizex: 1.8
       color: text
-
-    equipment:
-      type: text
-      x: 0.5
-      y: 3.1
-      sizex: 1.0
-      color: text
-
-    icon:
-      type: icon
-      x: 1.5
-      y: 1.5
-      image: blah.png
-      color: none
-      sizex: 0.32
-      sizey: 0.32

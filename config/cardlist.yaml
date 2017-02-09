@@ -41,7 +41,7 @@ cards:
   - name: "Maer Guardian"
     copies: 1
 
-  - name: "Nulifier"
+  - name: "Nullifier"
     copies: 1
 
   - name: "Colossus"
@@ -108,49 +108,46 @@ cards:
     copies: 1
 
   - name: "Hill"
-    copies: 2
+    copies: 0
 
   - name: "Tundra"
-    copies: 2
+    copies: 0
 
   - name: "Tower"
-    copies: 2
+    copies: 0
 
   - name: "Chasm"
-    copies: 2
+    copies: 0
 
   - name: "Plateau"
-    copies: 2
+    copies: 0
 
   - name: "Shrubland"
-    copies: 2
-
-  - name: "Summoning Platform"
-    copies: 2
+    copies: 0
 
   - name: "Chroma Well"
-    copies: 2
+    copies: 0
 
   - name: "Sanctum"
-    copies: 2
+    copies: 0
 
   - name: "Fire Lands"
-    copies: 2
+    copies: 0
 
   - name: "Void Shrine"
-    copies: 2
+    copies: 0
 
   - name: "Victory Shrine"
-    copies: 2
+    copies: 0
 
   - name: "Oracle Shrine"
-    copies: 2
+    copies: 0
 
   - name: "Windfall"
-    copies: 2
+    copies: 0
 
   - name: "Tunnel"
-    copies: 3
+    copies: 0
 
   - name: "Disruptor"
     copies: 6
@@ -158,10 +155,10 @@ cards:
   - name: "Lieutenant"
     copies: 6
 
-  - name: "Brute"
+  - name: "Prophet"
     copies: 6
 
-  - name: "Aegis"
+  - name: "Bastion"
     copies: 6
 
   - name: "Bounty Hunter"
@@ -194,34 +191,22 @@ cards:
   - name: "Guard Tower"
     copies: 2
 
-  - name: "Wandering Monk"
+  - name: "Paladin"
     copies: 1
 
-  - name: "Longsword"
-    copies: 6
+  - name: "Shifting Blade"
+    copies: 3
 
-  - name: "Greatsword"
-    copies: 6
+  - name: "Dragon Plate"
+    copies: 3
 
   - name: "Scout's Prerogative"
-    copies: 6
-
-  - name: "Studded Leather"
-    copies: 6
-
-  - name: "Platemail"
-    copies: 6
-
-  - name: "Chromatic Orb"
-    copies: 6
-
-  - name: "Staff of the Master"
-    copies: 6
+    copies: 1
 
   - name: "Static Field"
     copies: 1
 
-  - name: "Auto Salvager"
+  - name: "Overdrive Reactor"
     copies: 1
 
   - name: "Soul Link"
@@ -278,7 +263,7 @@ cards:
   - name: "Aether Wings"
     copies: 12
 
-  - name: "Summoning Stone"
+  - name: "Runic Beacon"
     copies: 12
 
   - name: "Frenzy"

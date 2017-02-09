@@ -20,16 +20,24 @@ file.worksheets.each do |ws|
   cards = cards.merge(symbol_replace(read_worksheet(ws)))
 end
 
-r = CardRenderer.new('/colors.yaml', '/cardlayout.yaml', '/cardlist.yaml', 'images/', '../output/')
+r = CardRenderer.new(
+  '/colors.yaml',
+  '/cardlayout.yaml',
+  '/cardlist.yaml',
+  '/symbols.yaml',
+  'images/',
+  '../output/'
+)
 
-cards.each do |title, card|
-  print "\n#{title} ======\n"
+#cards.each do |title, card|
+card = cards['Troops']
+  #print "\n#{title} ======\n"
 
   card.each do |t, c|
     print "#{t}\n"
 
     r.render_card(c)
   end
-end
+#end
 
 #r.render_cardlist('/output/output.png')

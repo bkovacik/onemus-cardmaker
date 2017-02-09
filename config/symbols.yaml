@@ -1,7 +1,7 @@
 symbols:
   - symbol: "~"
     replace: name
-    field: true
+    image: false
     fields:
       - ability_1
       - ability_2
@@ -10,7 +10,7 @@ symbols:
 
   - symbol: "@"
     replace: title
-    field: true
+    image: false
     fields:
       - ability_1
       - ability_2
@@ -18,30 +18,18 @@ symbols:
 
   - symbol: "^"
     replace: hero
-    field: true
+    image: false
     fields:
       - ability
 
   - symbol: "%"
     replace: SOTM
-    field: false
+    image: false
     fields:
       - ability
 
-  - symbol: "`o"
-    replace: weapon
-    field: false
+  - symbol: "`b"
+    replace: weapon.png
+    image: true
     fields:
-      - equipment
-
-  - symbol: "`a"
-    replace: ability
-    field: false
-    fields:
-      - equipment
-
-  - symbol: "`d"
-    replace: armor
-    field: false
-    fields:
-      - equipment
+      - ability

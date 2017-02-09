@@ -1,5 +1,6 @@
 require 'rmagick'
 require 'yaml'
+require_relative 'size_image'
 include Magick
 
 DEFAULT_TEXT_SIZE = 0.15
@@ -9,15 +10,17 @@ class CardRenderer
   # Args[0] = colors
   # Args[1] = layout
   # Args[2] = cardList
-  # Args[3] = images
-  # Args[4] = outdir
+  # Args[3] = symbols
+  # Args[4] = images
+  # Args[5] = outdir
   def initialize(*args)
     confdir = File.expand_path('../config', File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args[0])
     @layout = YAML.load_file(confdir + args[1])['layout']
     @cardList = YAML.load_file(confdir + args[2])
-    @images = args[3]
-    @outdir = args[4]
+    @symbols = YAML.load_file(confdir + args[3])['symbols']
+    @images = args[4]
+    @outdir = args[5]
 
     @imageCache = {}
 
@@ -43,7 +46,7 @@ class CardRenderer
       self.format = 'png'
     }
 
-    draw(c, card)
+    draw!(c, card)
 
     unless (card['name'].nil?)
       name = card['name'] + '.png'
@@ -77,13 +80,13 @@ class CardRenderer
 
   private
     # Draws a card to image
-    def draw(image, card) 
+    # Mutates image
+    def draw!(image, card) 
       drawHash = {};
 
       @fields.each do |name, field|
         d = Draw.new
         color = field['color']
-        drawHash[name] = d
         pos = {}
 
         # defaults
@@ -91,12 +94,14 @@ class CardRenderer
         unless field['rotate'] then field['rotate'] = 0 end
 
         case field['type']
+        when 'combined'
+          draw_combined!(name, field, image, card, drawHash)
         when 'rounded', 'rect'
-          draw_shape(name, field, image, card, drawHash, field['type'])
+          draw_shape!(name, field, image, card, drawHash, field['type'])
         when 'text'
-          draw_text(name, field, image, card, drawHash)
+          draw_text!(name, field, image, card, drawHash)
         when 'icon', 'image'
-          draw_image(name, field, image, card, drawHash)
+          draw_image!(name, field, image, card, drawHash)
         else
           raise "Invalid type field for #{name}!"
         end
@@ -105,19 +110,9 @@ class CardRenderer
       @imageCache[card['name']] = image
     end
 
-    # Rotates provided coords by deg
-    # Returns [x', y']
-    def rotate_coords(x, y, deg)
-      d = deg * Math::PI / 180
-
-      return [
-        x*Math.cos(d) - y*Math.sin(d),
-        x*Math.sin(d) + y*Math.cos(d)
-      ]
-    end
-
     # Draws image on image
-    def draw_image(name, field, image, card, drawHash)
+    # Mutates image
+    def draw_image!(name, field, image, card, drawHash)
       imagepath = @images + field['image']
       temp = Image.read(imagepath).first
 
@@ -140,29 +135,36 @@ class CardRenderer
       pos = relative_to_value(drawHash, field, card)
 
       # Draw rect to image as placeholder
-      draw_shape(name, field, image, card, drawHash, 'rect')      
+      draw_shape!(name, field, image, card, drawHash, 'rect')      
 
-      rotate_image(field, temp)
+      rotate_image!(field, temp)
 
       r = Math.sin(45*Math::PI/180)*size.values.min
       rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
 
       adjust_size!(size, field['rotate'])
+      min_axis = size.values.min
 
       image.composite!(
         temp,
-        pos['x'] - size['x']/2 + r*Math.cos(rad),
-        pos['y'] - size['y']/2 + r*Math.sin(rad),
+        pos['x'] - min_axis/2 + r*Math.cos(rad),
+        pos['y'] - min_axis/2 + r*Math.sin(rad),
         OverCompositeOp
       )
     end
 
-    # Draws text on image
+    # Creates image from text
+    # Returns image
     def draw_text(name, field, image, card, drawHash)
       color = field['color']
       d = Draw.new
       drawHash[name] = d
-      d.interline_spacing = -5
+      spacing = -5
+      d.interline_spacing = spacing
+
+      d.fill = @globals[color].nil? ?
+        @aspects[card['aspect']]['color'][color] : @globals[color]
+
       fontsize = field['textsize'].nil? ?
         DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
       d.pointsize = fontsize
@@ -179,7 +181,7 @@ class CardRenderer
 
       pos = relative_to_value(drawHash, field, card)
 
-      rotate_drawing(field, d, pos)
+      rotate_drawing!(field, d, pos)
 
       # compensate for text-align
       case field['align']
@@ -189,33 +191,56 @@ class CardRenderer
         d.translate((field['sizex']*@dpi).floor, 0)
       end
 
+      size = {}
       if (card[name])
-        # scale down
-        if (field['sizey'] and field['sizex'])
-          m = d.get_type_metrics(card[name])
-          scale = m.width*m.height/field['sizex']/@dpi
-          y = field['sizey']*@dpi
-          if (scale > y)
-            fontsize *= y/scale
-            d.pointsize = fontsize 
-          end
+        if (field['scale'])
+          fontsize *= (1 + field['scale'])/2
+        else
+          fontsize *= (1 + scale_down(card[name], field, d))/2
         end
+
+        d.pointsize = fontsize
+
+        broken_text = break_text(
+          (field['sizex']*@dpi),
+          card[name],
+          d
+        )
         d.text(
           0,
           0,
-          break_text(
-            (field['sizex']*@dpi).floor,
-            card[name],
-            d
-          )
+          broken_text
         )
+
+        m = d.get_type_metrics(card[name])
+        size = { 'x' => m.width, 'y' => m.height+spacing }
       end
+
+      if (image.nil?)
+        image = SizeImage.new(Image.new(
+          size['x'],
+          size['y']
+        ) {
+          self.background_color = 'transparent'
+          self.format = 'png'
+        }, { 'rows' => size['y'], 'columns' => size['x'] })
+        d.gravity = SouthEastGravity
+      end
+
+      return [d, image]
+    end
+
+    # Draws text on image
+    # Mutates image
+    def draw_text!(name, field, image, card, drawHash)
+      d, im, y = draw_text(name, field, image, card, drawHash)
 
       d.draw(image)
     end
 
     # Draws shape on image
-    def draw_shape(name, field, image, card, drawHash, shape)
+    # Mutates image
+    def draw_shape!(name, field, image, card, drawHash, shape)
       color = field['color']
       d = Draw.new
       drawHash[name] = d
@@ -224,7 +249,7 @@ class CardRenderer
 
       pos = relative_to_value(drawHash, field, card)
 
-      rotate_drawing(field, d, pos)
+      rotate_drawing!(field, d, pos)
 
       case shape
         when 'rounded'
@@ -248,8 +273,171 @@ class CardRenderer
       d.draw(image)
     end
 
+    # Draws combined (text + image) on image
+    # Mutates image
+    def draw_combined!(name, field, image, card, drawHash)
+      if (card[name])
+        text = [card[name]]
+
+        @symbols.each do |symbol|
+          if (symbol['image'] and symbol['fields'].include?(name))
+            temp = []
+
+            text.each_with_index do |token, i|
+              if (token.class == SizeImage)
+                temp.push(token)
+              elsif (!token.empty?)
+                tokens = token.split(/(#{symbol['symbol']})/)
+                temp.push(*tokens)
+              end
+            end
+
+            imagepath = @images + symbol['replace']
+
+            m = Image.ping(imagepath).first
+            replace_image = SizeImage.new(
+              Image.read(imagepath).first,
+              { 'rows' => m.rows, 'columns' => m.columns }
+            ) 
+            text = temp.flatten.map { |x| 
+              if (x == symbol['symbol']) 
+                replace_image
+              else
+                x
+              end
+            }
+          end
+        end
+
+        il = ImageList.new
+
+        text.delete('')
+
+        # run a space through to get the text height
+        dr, tt = draw_text(
+          'text',
+          {
+            'x' => 0,
+            'y' => 0,
+            'color' => field['color'],
+            'sizex' => field['sizex']
+          },
+          nil,
+          {'text' => '.', 'aspect' => 'c'},
+          nil
+        )
+
+        height = dr.get_type_metrics('.').height
+        min = tt.measurements['rows']
+        textlength = 0
+
+        text.each_with_index do |item, i|
+          if (item.class == SizeImage)
+            sc = min/item.measurements['rows']
+            item.measurements['columns'] *= sc
+            item.measurements['rows'] *= sc
+
+            textlength += item.measurements['columns']*sc
+          else
+            textlength += dr.get_type_metrics(item).width
+          end
+        end
+
+        scale = field['sizey'] ?
+          (field['sizex']*field['sizey']*@dpi**2)/height/textlength : 1
+        scale = [scale, 1].min
+
+        # get new draw obj
+        dr, _ = draw_text(
+          'text',
+          {
+            'x' => 0,
+            'y' => 0,
+            'color' => field['color'],
+            'sizex' => field['sizex'],
+            'scale' => scale
+          },
+          nil,
+          {'text' => '.', 'aspect' => 'c'},
+          nil
+        )
+
+        lines = break_text_with_image(field['sizex']*@dpi, text, dr)
+
+        lines.each_with_index do |line, i|
+          tempimlist = ImageList.new
+
+          line.each do |item|
+            im = nil
+ 
+            if (item.class == SizeImage)
+              im = item.image.resize(
+                scale*item.measurements['columns'],
+                scale*item.measurements['rows']
+            )
+            else
+              dr, im = draw_text(
+                'text',
+                {
+                  'x' => 0,
+                  'y' => 0,
+                  'color' => field['color'],
+                  'rotate' => 0,
+                  'sizex' => field['sizex'],
+                  'scale' => scale
+                },
+                nil,
+                {'text' => item, 'aspect' => card['aspect']},
+                drawHash
+              )
+              im = im.image
+              dr.draw(im)
+            end
+
+            tempimlist << im
+          end
+
+          tempimg = tempimlist.append(false)
+          case field['align']
+          when 'center'
+            pad = ((field['sizex']*@dpi) - tempimg.bounding_box.width)/2
+          when 'right'
+            pad = ((field['sizex']*@dpi) - tempimg.bounding_box.width)
+          else
+            pad = 0
+          end
+
+          tempimlist.destroy!
+          tempimlist = ImageList.new 
+
+          unless (pad.zero?)
+            padimg = Image.new(
+              pad,
+              tempimg.bounding_box.height
+            ) {
+              self.background_color = 'none'
+            }
+            tempimlist << padimg
+          end
+
+          tempimlist << tempimg
+
+          il << tempimlist.append(false)
+          tempimlist.destroy!
+        end
+
+        pos = relative_to_value(drawHash, field, card)
+        output = il.append(true)
+        il.destroy!
+
+        rotate_image!(field, output)
+        image.composite!(output, pos['x'], pos['y'], OverCompositeOp)
+      end
+    end
+
     # Rotates drawing and translates coordinates back to "normal"
-    def rotate_drawing(field, d, pos)
+    # Mutates d
+    def rotate_drawing!(field, d, pos)
       if (field['rotate'])
         d.rotate(field['rotate'])
         d.translate(
@@ -268,7 +456,8 @@ class CardRenderer
     end
 
     # Rotates image
-    def rotate_image(field, image)
+    # Mutates image
+    def rotate_image!(field, image)
       if (field['rotate'])
         image.background_color = 'none'
         image.rotate!(field['rotate'])
@@ -337,11 +526,7 @@ class CardRenderer
           result << line
           line = word
         else
-          line += word
-        end
-
-        if (i != t.size - 1)
-          line += ' '
+          line += ' ' + word
         end
       end
 
@@ -350,6 +535,79 @@ class CardRenderer
       end
 
       return result.join("\n")
+    end
+
+    # Breaks textarray based on the given width
+    # Returns nested array
+    def break_text_with_image(width, textarray, draw)
+      tokens = textarray.flat_map{ |x| x.respond_to?(:split) ? x.split(' ') : x }
+
+      result = []
+      line = []
+      linelength = 0
+
+      tokens.each do |item|
+        itemlength = item.class == SizeImage ?
+          item.measurements['columns'] : draw.get_type_metrics(item + ' ').width
+
+        if (itemlength + linelength > width)
+          result << line
+          line = [item]
+          linelength = itemlength 
+        else
+          if (!line.empty?)
+            t = line.pop
+
+            if (t != SizeImage)
+              t += ' '
+            end
+            
+            if (item.class == SizeImage)
+              line << t << item << ' '
+            else
+              line << t + item
+            end
+          else
+            line << item
+          end
+
+          linelength += itemlength
+        end
+      end
+
+      unless (line.empty?)
+        result << line
+      end
+
+      return result
+    end
+
+    def scale_down(text, size, d)
+      if (size['sizey'].nil?)
+        return 1
+      end
+
+      # scale down
+      if (size['sizex'])
+        m = d.get_type_metrics(text)
+        scale = m.width*m.height/size['sizex']/@dpi
+        y = size['sizey']*@dpi
+
+        return [y/scale, 1].min
+      end
+
+      raise 'No sizey and/or sizex!'
+    end
+
+    # Rotates provided coords by deg
+    # Returns [x', y']
+    def rotate_coords(x, y, deg)
+      d = deg * Math::PI / 180
+
+      return [
+        x*Math.cos(d) - y*Math.sin(d),
+        x*Math.sin(d) + y*Math.cos(d)
+      ]
     end
 
     # Reverse maps strings to RMagick constants

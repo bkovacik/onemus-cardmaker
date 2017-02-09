@@ -10,12 +10,12 @@ def symbol_replace(cards)
 
   carddata.each do |name, card|
     symbols.each do |symbol|
-      symbol['fields'].each do |ability|
-        unless (card[ability].nil?)
-          if (symbol['field'] and !card[symbol['replace']].nil?)
-            card[ability] = card[ability].gsub(symbol['symbol'], card[symbol['replace']])
-          elsif (!symbol['field'].nil?)
-            card[ability] = card[ability].gsub(symbol['symbol'], symbol['replace'])
+      symbol['fields'].each do |field|
+        if (card[field] and !symbol['image'].nil? and !symbol['image'])
+          if (card[symbol['replace']])
+            card[field] = card[field].gsub(symbol['symbol'], card[symbol['replace']])
+          else
+            card[field] = card[field].gsub(symbol['symbol'], symbol['replace'])
           end
         end
       end
