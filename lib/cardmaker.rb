@@ -1,4 +1,5 @@
 require 'google_drive'
+require 'fileutils'
 require_relative 'read_worksheet'
 require_relative 'render_card'
 require_relative 'symbol_replace'
@@ -29,6 +30,8 @@ r = CardRenderer.new(
   '../output/'
 )
 
+FileUtils.rm_rf(Dir['./output/*'])
+
 #cards.each do |title, card|
 card = cards['Troops']
   #print "\n#{title} ======\n"
@@ -40,4 +43,5 @@ card = cards['Troops']
   end
 #end
 
+Dir.mkdir('./output/output')
 #r.render_cardlist('/output/output.png')
