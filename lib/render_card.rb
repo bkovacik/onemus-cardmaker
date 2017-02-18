@@ -7,30 +7,26 @@ DEFAULT_TEXT_SIZE = 0.15
 FONT_DIR = 'C:/Windows/Fonts/'
 
 class CardRenderer
-  # Args[0] = colors
-  # Args[1] = layout
-  # Args[2] = cardList
-  # Args[3] = symbols
-  # Args[4] = images
-  # Args[5] = outdir
-  def initialize(*args)
+  def initialize(args)
     confdir = File.expand_path('../config', File.dirname(__FILE__))
-    @colors = YAML.load_file(confdir + args[0])
-    @layout = YAML.load_file(confdir + args[1])['layout']
-    @cardList = YAML.load_file(confdir + args[2])
-    @symbols = YAML.load_file(confdir + args[3])['symbols']
-    @images = args[4]
-    @outdir = args[5]
+    @colors = YAML.load_file(confdir + args['colors'])
+    @layout = YAML.load_file(confdir + args['cardlayout'])['layout']
+    @cardList = YAML.load_file(confdir + args['cardlist'])
+    @symbols = YAML.load_file(confdir + args['symbols'])['symbols']
+    @images = args['images']
+    @outdir = args['outdir']
 
     @imageCache = {}
 
-    @dpi = @layout['dpi']
+    @dpi = args['dpi'] ? args['dpi'] : @layout['dpi']
 
     @aspects = @colors['aspects']
 
     @globals = @colors['globals']
 
     @fields = @layout['fields'] 
+
+    @tile = args['tile']
 
     @cardX = (@layout['x'] * @dpi).floor
     @cardY = (@layout['y'] * @dpi).floor
@@ -72,9 +68,11 @@ class CardRenderer
       end
     end
 
+    tile = @tile
+
     imageList.montage{
       self.geometry = "#{@cardX}x#{@cardY}+2+2"
-      self.tile = "3x3"
+      self.tile = tile
     }.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
 
@@ -206,6 +204,7 @@ class CardRenderer
           card[name],
           d
         )
+
         d.text(
           0,
           0,
@@ -526,7 +525,8 @@ class CardRenderer
           result << line
           line = word
         else
-          line += ' ' + word
+          line += ' ' unless (i == 0)
+          line += word
         end
       end
 
@@ -546,24 +546,26 @@ class CardRenderer
       line = []
       linelength = 0
 
-      tokens.each do |item|
+      tokens.each_with_index do |item, i|
         itemlength = item.class == SizeImage ?
           item.measurements['columns'] : draw.get_type_metrics(item + ' ').width
 
         if (itemlength + linelength > width)
           result << line
           line = [item]
-          linelength = itemlength 
+          linelength = itemlength
         else
           if (!line.empty?)
             t = line.pop
 
-            if (t != SizeImage)
+            if (t.class != SizeImage)
               t += ' '
             end
             
-            if (item.class == SizeImage)
-              line << t << item << ' '
+            if (t.class == SizeImage or item.class == SizeImage)
+              line << t << item
+
+              line << ' ' if (i != tokens.length - 1)
             else
               line << t + item
             end
