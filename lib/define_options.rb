@@ -13,6 +13,7 @@ class DefineOptions
         '--cardlist=/cardlist.yaml',
         '--symbols=/symbols.yaml',
         '--images=images/',
+        '--statictext=/statictext.yaml',
         '--outdir=../output/'
       ] + ARGV
 
@@ -39,8 +40,13 @@ class DefineOptions
       opts.on('--symbols=SYMBOLS', String, 'Path to symbols') do |s|
         options['symbols'] = s
       end
+
       opts.on('--images=IMAGES', String, 'Path to images') do |i|
         options['images'] = i
+      end
+
+      opts.on('--statictext=TEXT', String, 'Path to statictext') do |t|
+        options['statictext'] = t
       end
 
       opts.on('-o', '--outdir=OUTDIR', String, 'Output directory') do |o|
