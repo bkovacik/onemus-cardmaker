@@ -17,7 +17,11 @@ unless (file = session.file_by_title(docname))
 end
 
 cards = {}
-file.worksheets.each do |ws|
+worksheets = file.worksheets.dup
+if (options['sheets'])
+  worksheets.select! { |sheet| options['sheets'].include?(sheet.title) }
+end
+worksheets.each do |ws|
   cards = cards.merge(symbol_replace(read_worksheet(ws)))
 end
 
@@ -25,10 +29,6 @@ r = CardRenderer.new(options)
 
 if options['clean']
   FileUtils.rm_rf(Dir['./output/*'])
-end
-
-if (options['sheets'])
-  cards.select! { |title, card| options['sheets'].include?(title) }
 end
 
 cards.each do |title, card|

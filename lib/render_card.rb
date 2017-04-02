@@ -97,11 +97,9 @@ class CardRenderer
 
         case field['type']
           when 'text', 'static'
-            draw_combined!(name, field, image, card, drawHash)
+            draw_text!(name, field, image, card, drawHash)
           when 'rounded', 'rect'
             draw_shape!(name, field, image, card, drawHash, field['type'])
-          #when 'text'
-          #  draw_text!(name, field, image, card, drawHash)
           when 'icon', 'image'
             draw_image!(name, field, image, card, drawHash)
           else
@@ -154,94 +152,7 @@ class CardRenderer
         OverCompositeOp
       )
     end
-=begin
-    # Creates image from text
-    # Returns image
-    def draw_text(name, field, image, card, drawHash)
-      color = field['color']
-      d = Draw.new
-      spacing = -5
-      d.interline_spacing = spacing
 
-      d.fill = @globals[color].nil? ?
-        @aspects[card['aspect']]['color'][color] : @globals[color]
-
-      fontsize = field['textsize'].nil? ?
-        DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
-      d.pointsize = fontsize
-
-      font = FONT_DIR +
-        (field['font'].nil? ? @layout['font'] : field['font']) +
-        '.ttf'
-      unless File.file?(font)
-        raise "#{font} not found!"
-      else
-        d.font = font 
-      end
-      unless field['align'].nil? then d.align = to_constant(field['align']) end
-
-      pos = relative_to_value(drawHash, field, card)
-
-      rotate_drawing!(field, d, pos)
-
-      # compensate for text-align
-      case field['align']
-        when 'center'
-          d.translate((field['sizex']*@dpi/2), 0)
-        when 'right'
-          d.translate((field['sizex']*@dpi).floor, 0)
-      end
-
-      size = {}
-      if (card[name])
-        if (field['scale'])
-          fontsize *= (1 + field['scale'])/2
-        else
-          fontsize *= (1 + scale_down(card[name], field, d))/2
-        end
-
-        d.pointsize = fontsize
-
-        broken_text = break_text(
-          (field['sizex']*@dpi),
-          card[name],
-          d
-        )
-
-        d.text(
-          0,
-          0,
-          broken_text
-        )
-
-        m = d.get_type_metrics(card[name])
-        size = { 'x' => m.width, 'y' => m.height+spacing }
-      end
-
-      drawHash[name] = SizeStruct.new(size['x'], size['y'])
-
-      if (image.nil?)
-        image = SizeImage.new(Image.new(
-          size['x'],
-          size['y']
-        ) {
-          self.background_color = 'transparent'
-          self.format = 'png'
-        }, { 'rows' => size['y'], 'columns' => size['x'] })
-        d.gravity = SouthEastGravity
-      end
-
-      return [d, image]
-    end
-
-    # Draws text on image
-    # Mutates image
-    def draw_text!(name, field, image, card, drawHash)
-      d, im, y = draw_text(name, field, image, card, drawHash)
-
-      d.draw(image)
-    end
-=end
     # Draws shape on image
     # Mutates image
     def draw_shape!(name, field, image, card, drawHash, shape)
@@ -280,7 +191,7 @@ class CardRenderer
 
     # Draws combined (text + image) on image
     # Mutates image
-    def draw_combined!(name, field, image, card, drawHash)
+    def draw_text!(name, field, image, card, drawHash)
       case field['type']
         when 'text'
           text = [card[name]]
@@ -290,6 +201,16 @@ class CardRenderer
       end
 
       return if text.first.nil?
+
+      d = Draw.new 
+      font = FONT_DIR +
+        (field['font'].nil? ? @layout['font'] : field['font']) +
+        '.ttf'
+      unless File.file?(font)
+        raise "#{font} not found!"
+      else
+        d.font = font 
+      end
 
       @symbols.each do |symbol|
         if (symbol['image'] and symbol['fields'].include?(name))
@@ -325,24 +246,23 @@ class CardRenderer
 
       text.delete('')
 
-      d = Draw.new
       fontsize = field['textsize'].nil? ?
         DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
       d.pointsize = fontsize
 
       height = d.get_type_metrics('.').height
-      min = tt.measurements['rows']
+      #min = tt.measurements['rows']
       textlength = 0
 
       text.each_with_index do |item, i|
         if (item.class == SizeImage)
-          sc = min/item.measurements['rows']
+          sc = height/item.measurements['rows']
           item.measurements['columns'] *= sc
           item.measurements['rows'] *= sc
 
           textlength += item.measurements['columns']*sc
         else
-          textlength += dr.get_type_metrics(item).width
+          textlength += d.get_type_metrics(item).width
         end
       end
 
@@ -350,22 +270,10 @@ class CardRenderer
         (field['sizex']*field['sizey']*@dpi**2)/height/textlength : 1
       scale = [scale, 1].min
 
-      # get new draw obj
-      dr, _ = draw_text(
-        'text',
-        {
-          'x' => 0,
-          'y' => 0,
-          'color' => field['color'],
-          'sizex' => field['sizex'],
-          'scale' => scale
-        },
-        nil,
-        {'text' => '.', 'aspect' => 'c'},
-        nil
-      )
+      d.pointsize = fontsize*scale
+      d.gravity = SouthWestGravity
 
-      lines = break_text_with_image(field['sizex']*@dpi, text, dr)
+      lines = break_text_with_image(field['sizex']*@dpi, text, d)
 
       lines.each_with_index do |line, i|
         tempimlist = ImageList.new
@@ -379,25 +287,20 @@ class CardRenderer
               scale*item.measurements['rows']
           )
           else
-            dr, im = draw_text(
-              'text',
-              {
-                'x' => 0,
-                'y' => 0,
-                'color' => field['color'],
-                'rotate' => 0,
-                'sizex' => field['sizex'],
-                'scale' => scale
-              },
-              nil,
-              {'text' => item, 'aspect' => card['aspect']},
-              drawHash
-            )
-            im = im.image
+            metrics = d.get_type_metrics(item)
+
+            im = Image.new(
+              metrics.width,
+              metrics.height
+            ) {
+              self.background_color = 'transparent'
+            }
+
+            dr = d.clone
+            dr.text(0, 0, item)
             dr.draw(im)
           end
 
-          im.background_color = 'transparent'
           tempimlist << im
         end
 
@@ -419,7 +322,7 @@ class CardRenderer
             pad,
             tempimg.bounding_box.height
           ) {
-            self.background_color = 'none'
+            self.background_color = 'transparent'
           }
           tempimlist << padimg
         end
@@ -430,17 +333,26 @@ class CardRenderer
         tempimlist.destroy!
       end
 
-      pos = relative_to_value(drawHash, field, card)
+      pos = relative_to_value(drawHash, field, card, 10)
       output = il.append(true)
       il.destroy!
 
       rotate_image!(field, output)
 
       bbox = output.bounding_box
+      bbox_a = [bbox.width, bbox.height]
       drawHash[name] = SizeStruct.new(bbox.width, bbox.height)
-#p drawHash
 
-      image.composite!(output, pos['x'], pos['y'], OverCompositeOp)
+      r = Math.sin(45*Math::PI/180)*bbox_a.min
+      rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
+      min_axis = bbox_a.min
+
+      image.composite!(
+        output,
+        pos['x'] - min_axis/2 + r*Math.cos(rad),
+        pos['y'] - min_axis/2 + r*Math.sin(rad),
+        OverCompositeOp
+      )
     end
 
     # Rotates drawing and translates coordinates back to "normal"
@@ -474,7 +386,7 @@ class CardRenderer
 
     # Traverses relative fields and calculates the correct position
     # Returns the value calculated
-    def relative_to_value(drawHash, field, card)
+    def relative_to_value(drawHash, field, card, padding=0)
       pos = {}
       {'x' => 'width', 'y' => 'height'}.each do |a, b|
         attribute = field[a]
@@ -484,9 +396,9 @@ class CardRenderer
           o, f = attribute.split('.')
           attribute = @fields[o][f]
 
-
           sizey = drawHash[o][:sizey]
           pos[a] += sizey if sizey
+          pos[a] += padding
         end
 
         pos[a] += (attribute*@dpi).floor

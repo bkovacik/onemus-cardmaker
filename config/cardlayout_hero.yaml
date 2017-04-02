@@ -1,6 +1,6 @@
 layout:
-  dpi: 300
-  x: 2.5
+  dpi: 150
+  x: 5.0
   y: 3.5
   font: OLDSH__
 
@@ -54,6 +54,30 @@ layout:
       x: 0.3 
       y: 1.4
       sizex: 2.0
+      color: text
+
+    ability_1:
+      type: text 
+      x: 0.3 
+      y: 1.5
+      sizex: 1.8
+      sizey: 1.4
+      color: text
+      
+    ability_2:
+      type: text 
+      x: 0.3 
+      y: ability_1.y
+      sizex: 1.8
+      sizey: 1.4
+      color: text
+
+    ability_3:
+      type: text 
+      x: 0.3 
+      y: ability_2.y
+      sizex: 1.8
+      sizey: 1.4
       color: text
 
     ability:
