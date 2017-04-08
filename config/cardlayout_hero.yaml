@@ -9,7 +9,7 @@ layout:
       type: rounded
       x: 0
       y: 0
-      sizex: 2.5
+      sizex: 5.0
       sizey: 3.5
       cornerx: 0.15 
       cornery: 0.15
@@ -19,13 +19,13 @@ layout:
       type: rect
       x: 0.15
       y: 0.15
-      sizex: 2.2
+      sizex: 4.7
       sizey: 3.2
       color: base 
 
     name:
       type: text
-      x: 0.35
+      x: 1.5
       y: 0.3
       sizex: 2.1
       color: text
@@ -58,15 +58,15 @@ layout:
 
     ability_1:
       type: text 
-      x: 0.3 
-      y: 1.5
+      x: 2.8 
+      y: 0.4
       sizex: 1.8
       sizey: 1.4
       color: text
       
     ability_2:
       type: text 
-      x: 0.3 
+      x: 2.8 
       y: ability_1.y
       sizex: 1.8
       sizey: 1.4
@@ -74,7 +74,7 @@ layout:
 
     ability_3:
       type: text 
-      x: 0.3 
+      x: 2.8 
       y: ability_2.y
       sizex: 1.8
       sizey: 1.4

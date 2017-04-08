@@ -99,7 +99,9 @@ class CardRenderer
           when 'text', 'static'
             draw_text!(name, field, image, card, drawHash)
           when 'rounded', 'rect'
-            draw_shape!(name, field, image, card, drawHash, field['type'])
+            draw_rect!(name, field, image, card, drawHash)
+          when /(\d+)gon/
+            draw_poly!(name, field, image, card, drawHash, $1)
           when 'icon', 'image'
             draw_image!(name, field, image, card, drawHash)
           else
@@ -153,9 +155,9 @@ class CardRenderer
       )
     end
 
-    # Draws shape on image
+    # Draws rectangle on image
     # Mutates image
-    def draw_shape!(name, field, image, card, drawHash, shape)
+    def draw_rect!(name, field, image, card, drawHash, shape)
       color = field['color']
       d = Draw.new
       d.fill = @globals[color].nil? ?
@@ -165,7 +167,7 @@ class CardRenderer
 
       rotate_drawing!(field, d, pos)
 
-      case shape
+      case field['type']
         when 'rounded'
           d.roundrectangle(
             0,
@@ -187,6 +189,65 @@ class CardRenderer
       adjust_size!({'x' => field['sizex'], 'y' => field['sizey']}, field['rotate'])
       drawHash[name] = SizeStruct.new(field['sizex']*@dpi, field['sizey']*@dpi)
       d.draw(image)
+    end
+
+    # Draws n-gon on image
+    # Mutates image
+    def draw_poly!(name, field, image, card, drawHash, n)
+      d = Draw.new
+
+      n = n.to_i
+      side = field['side']*@dpi
+      m = get_poly_meas(side, n)
+      dims = get_poly_dims(side, n)
+      r = m[:r]
+
+      angle_diff = 0
+      if (field['round'])
+        new_r = Math.sqrt(m[:apothem]**2 + (side/2-field['round']*@dpi)**2)
+        angle_diff = Math.sin(m[:interior_angle]/2)*field['round']*@dpi/new_r
+        iterations = [-1, 0, 1]
+        labels = ['L', 'Q', '']
+        radii = [new_r, r, new_r]
+      else
+        iterations = [0]
+        labels = ['L']
+        radii = [r]
+      end
+
+      if (n.odd?)
+        rotate_offset = Math::PI/2-m[:center_angle]
+      else
+        if ((n/2).odd?)
+          rotate_offset = 0
+        else
+          rotate_offset = m[:center_angle]/2
+        end
+      end
+
+      coords = []
+      n.times do |i|
+        iterations.each_with_index do |a, j|
+          str = labels[j]
+          str += (radii[j] * Math.cos(m[:center_angle]*i - rotate_offset + angle_diff*a)\
+            + dims[:offsetx]).to_i.to_s
+
+          str += ','
+
+          str += (radii[j] * Math.sin(m[:center_angle]*i - rotate_offset + angle_diff*a)\
+            + dims[:offsety]).to_i.to_s
+
+          coords << str 
+        end
+      end
+
+      path = coords.join(' ')
+      path[0] = ''
+      path.prepend('M')
+      path << ' Z'
+
+      d.path(path)
+      d.draw(image) 
     end
 
     # Draws combined (text + image) on image
@@ -285,7 +346,8 @@ class CardRenderer
             im = item.image.resize(
               scale*item.measurements['columns'],
               scale*item.measurements['rows']
-          )
+            )
+            im.background_color = 'transparent'
           else
             metrics = d.get_type_metrics(item)
 
@@ -534,5 +596,52 @@ class CardRenderer
       when 'center'
         return CenterAlign
       end
+    end
+
+    # Takes in sidelength and number of sides
+    # Returns {width, height}
+    def get_poly_dims(side, n)
+      m = get_poly_meas(side, n)
+
+      if (n.odd?)
+        h = m[:apothem] + m[:r]
+        w = Math.sin(m[:center_angle]*2)*m[:r]/Math.sin((Math::PI-m[:center_angle]*2)/2)
+        offsety = m[:r]
+      else
+        if ((n/2).odd?)
+          h = m[:apothem]*2
+          w = m[:r]*2
+        else
+          h = m[:apothem]*2
+          w = h
+        end
+
+        offsety = h/2
+      end
+
+      return {
+        width: w,
+        height: h,
+        offsetx: w/2,
+        offsety: offsety
+      }
+    end
+
+    # Takes in sidelength and number of sides
+    # Returns {interior_angle, center_angle, r, apothem}
+    def get_poly_meas(side, n)
+      interior_angle = (n-2)*Math::PI/n
+      center_angle = 2*Math::PI/n
+
+      r = side/Math.sin(center_angle)*Math.sin(interior_angle/2)
+      apothem = r*Math.sin(interior_angle/2)
+
+      return {
+        interior_angle: interior_angle,
+        center_angle: center_angle,
+
+        r: r,
+        apothem: apothem
+      }
     end
 end

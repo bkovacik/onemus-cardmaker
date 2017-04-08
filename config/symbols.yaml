@@ -33,3 +33,6 @@ symbols:
     image: true
     fields:
       - ability
+      - ability_1
+      - ability_2
+      - ability_3

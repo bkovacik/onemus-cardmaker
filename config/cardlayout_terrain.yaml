@@ -1,0 +1,15 @@
+layout:
+  dpi: 150
+  x: 2
+  y: 1.8
+  font: OLDSH__
+
+  fields:
+    background:
+      type: 6gon
+      x: 0
+      y: 0
+      side: 1
+      color: base
+      round: 0.15
+
