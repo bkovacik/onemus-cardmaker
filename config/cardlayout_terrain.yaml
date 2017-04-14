@@ -1,15 +1,52 @@
 layout:
   dpi: 150
-  x: 2
-  y: 1.8
+  x: 1.6
+  y: 1.4
   font: OLDSH__
 
   fields:
-    background:
+    border:
       type: 6gon
       x: 0
       y: 0
-      side: 1
-      color: base
-      round: 0.15
+      side: 0.78
+      color: border
+      round: 0.1
 
+    background2:
+      type: 6gon
+      x: 0.1
+      y: 0.1
+      side: 0.67
+      color: base
+
+    background:
+      type: image
+      x: 0.1
+      y: 0.1
+      sizex: 1.4
+      sizey: 1.2
+      poly-mask: 6
+      side: 0.67
+      image: terrain.png
+
+    name:
+      type: text
+      x: 0.4
+      y: 0.2
+      sizex: 0.7
+      sizey: 0.14
+      align: center
+      color: text
+      textsize: 0.14
+      font: Livingst
+
+    ability:
+      type: text
+      x: 0.25
+      y: 0.6
+      sizex: 1.1
+      sizey: 0.45
+      align: center
+      color: text
+      textsize: 0.11

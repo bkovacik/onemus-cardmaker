@@ -1,0 +1,48 @@
+cards:
+  - name: "Hill"
+    copies: 2
+
+  - name: "Tundra"
+    copies: 3
+
+  - name: "Tower"
+    copies: 3
+
+  - name: "Chasm"
+    copies: 3
+
+  - name: "Plateau"
+    copies: 3
+
+  - name: "Shrubland"
+    copies: 3
+
+  - name: "Chroma Well"
+    copies: 3
+
+  - name: "Sanctum"
+    copies: 2
+
+  - name: "Fire Lands"
+    copies: 3
+
+  - name: "Void Shrine"
+    copies: 2
+
+  - name: "Victory Shrine"
+    copies: 3
+
+  - name: "Oracle Shrine"
+    copies: 3
+
+  - name: "Windfall"
+    copies: 3
+
+  - name: "Tunnel"
+    copies: 4
+
+  - name: "Ridge"
+    copies: 2
+
+  - name: "Gully"
+    copies: 2

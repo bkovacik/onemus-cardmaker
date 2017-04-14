@@ -127,9 +127,30 @@ class CardRenderer
       ['x', 'y'].each do |a|
         if (field['size' + a]) 
           size[a] = field['size' + a]*@dpi
-        else
-          field['size' + a] = size[a]/@dpi
         end
+      end
+
+      temp.resize!(size['x'], size['y'])
+
+      if (field['poly-mask'])
+        mask = Image.new(size['x'], size['y']) {
+          self.background_color = 'transparent'
+        }
+
+        draw_poly!(
+          '',
+          {
+            'x' => 0,
+            'y' => 0,
+            'side' => field['side'] 
+          },
+          mask,
+          {},
+          {},
+          field['poly-mask']
+        )
+
+        temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
 
       temp.resize!(size['x'], size['y'])
@@ -194,13 +215,21 @@ class CardRenderer
     # Draws n-gon on image
     # Mutates image
     def draw_poly!(name, field, image, card, drawHash, n)
+      color = field['color']
       d = Draw.new
+      if (field['color'])
+        d.fill = @globals[color].nil? ?
+          @aspects[card['aspect']]['color'][color] : @globals[color]
+      end
 
       n = n.to_i
       side = field['side']*@dpi
       m = get_poly_meas(side, n)
       dims = get_poly_dims(side, n)
       r = m[:r]
+
+      pos = relative_to_value(drawHash, field, card)
+      rotate_drawing!(field, d, pos)
 
       angle_diff = 0
       if (field['round'])
@@ -247,6 +276,7 @@ class CardRenderer
       path << ' Z'
 
       d.path(path)
+      drawHash[name] = SizeStruct.new(dims[:width], dims[:height])
       d.draw(image) 
     end
 
@@ -599,7 +629,7 @@ class CardRenderer
     end
 
     # Takes in sidelength and number of sides
-    # Returns {width, height}
+    # Returns {width, height, offsetx, offsety}
     def get_poly_dims(side, n)
       m = get_poly_meas(side, n)
 
