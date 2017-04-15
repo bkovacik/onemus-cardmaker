@@ -1,6 +1,5 @@
 require 'rmagick'
 require 'yaml'
-require_relative 'size_image'
 include Magick
 
 DEFAULT_TEXT_SIZE = 0.15
@@ -315,7 +314,7 @@ class CardRenderer
           temp = []
 
           text.each_with_index do |token, i|
-            if (token.class == SizeImage)
+            if (token.class == Image)
               temp.push(token)
             elsif (!token.empty?)
               tokens = token.split(/(#{symbol['symbol']})/)
@@ -326,10 +325,8 @@ class CardRenderer
           imagepath = @images + symbol['replace']
 
           m = Image.ping(imagepath).first
-          replace_image = SizeImage.new(
-            Image.read(imagepath).first,
-            { 'rows' => m.rows, 'columns' => m.columns }
-          ) 
+          replace_image = Image.read(imagepath).first
+
           text = temp.flatten.map { |x| 
             if (x == symbol['symbol']) 
               replace_image
@@ -353,12 +350,11 @@ class CardRenderer
       textlength = 0
 
       text.each_with_index do |item, i|
-        if (item.class == SizeImage)
-          sc = height/item.measurements['rows']
-          item.measurements['columns'] *= sc
-          item.measurements['rows'] *= sc
+        if (item.class == Image)
+          sc = height/item.rows
+          item.resize!(sc)
 
-          textlength += item.measurements['columns']*sc
+          textlength += item.columns
         else
           textlength += d.get_type_metrics(item).width
         end
@@ -379,11 +375,8 @@ class CardRenderer
         line.each do |item|
           im = nil
 
-          if (item.class == SizeImage)
-            im = item.image.resize(
-              scale*item.measurements['columns'],
-              scale*item.measurements['rows']
-            )
+          if (item.class == Image)
+            im = item.resize(scale)
             im.background_color = 'transparent'
           else
             metrics = d.get_type_metrics(item)
@@ -557,8 +550,8 @@ class CardRenderer
       linelength = 0
 
       tokens.each_with_index do |item, i|
-        itemlength = item.class == SizeImage ?
-          item.measurements['columns'] : draw.get_type_metrics(item + ' ').width
+        itemlength = item.class == Image ?
+          item.columns : draw.get_type_metrics(item + ' ').width
 
         if (itemlength + linelength > width)
           result << line
@@ -568,11 +561,11 @@ class CardRenderer
           if (!line.empty?)
             t = line.pop
 
-            if (t.class != SizeImage)
+            if (t.class != Image)
               t += ' '
             end
             
-            if (t.class == SizeImage or item.class == SizeImage)
+            if (t.class == Image or item.class == Image)
               line << t << item
 
               line << ' ' if (i != tokens.length - 1)
