@@ -48,7 +48,7 @@ class CardRenderer
 
     draw!(c, card)
 
-    unless (card['name'].nil?)
+    if (card['name'])
       name = card['name'] + '.png'
     else
       raise "Card (#{card}) has no name field!"
@@ -102,7 +102,7 @@ class CardRenderer
             draw_rect!(name, field, image, card, drawHash)
           when /(\d+)gon/
             draw_poly!(name, field, image, card, drawHash, $1)
-          when 'icon', 'image'
+          when 'icon', 'image', 'aspect_icon'
             draw_image!(name, field, image, card, drawHash)
           else
             raise "Invalid type field for #{name}!"
@@ -115,7 +115,15 @@ class CardRenderer
     # Draws image on image
     # Mutates image
     def draw_image!(name, field, image, card, drawHash)
-      imagepath = @images + field['image']
+      case field['type']
+        when 'icon'
+          imagepath = @images + field['image']
+        when 'image'
+          imagepath = @images + card[name]
+        when 'aspect_icon'
+          imagepath = @images + field['images'][card['aspect']]
+      end
+          
       temp = Image.read(imagepath).first
 
       imageinfo = Image.ping(imagepath).first
@@ -165,8 +173,7 @@ class CardRenderer
       adjust_size!(size, field['rotate'])
       min_axis = size.values.min
 
-      bbox = temp.bounding_box
-      drawHash[name] = SizeStruct.new(bbox.width, bbox.height)
+      drawHash[name] = SizeStruct.new(temp.columns, temp.rows)
 
       image.composite!(
         temp,
@@ -181,8 +188,8 @@ class CardRenderer
     def draw_rect!(name, field, image, card, drawHash, shape)
       color = field['color']
       d = Draw.new
-      d.fill = @globals[color].nil? ?
-        @aspects[card['aspect']]['color'][color] : @globals[color]
+      d.fill = @globals[color] ?
+        @globals[color] : @aspects[card['aspect']]['color'][color]
 
       pos = relative_to_value(drawHash, field, card)
 
@@ -399,12 +406,13 @@ class CardRenderer
         tempimg = tempimlist.append(false)
         case field['align']
           when 'center'
-            pad = ((field['sizex']*@dpi) - tempimg.bounding_box.width)/2
+            pad = ((field['sizex']*@dpi) - tempimg.columns)/2
           when 'right'
-            pad = ((field['sizex']*@dpi) - tempimg.bounding_box.width)
+            pad = ((field['sizex']*@dpi) - tempimg.columns)
           else
             pad = 0
         end
+        pad = pad.to_i
 
         tempimlist.destroy!
         tempimlist = ImageList.new 
@@ -412,7 +420,7 @@ class CardRenderer
         unless (pad.zero?)
           padimg = Image.new(
             pad,
-            tempimg.bounding_box.height
+            tempimg.rows
           ) {
             self.background_color = 'transparent'
           }
@@ -431,9 +439,8 @@ class CardRenderer
 
       rotate_image!(field, output)
 
-      bbox = output.bounding_box
-      bbox_a = [bbox.width, bbox.height]
-      drawHash[name] = SizeStruct.new(bbox.width, bbox.height)
+      bbox_a = [output.columns, output.rows]
+      drawHash[name] = SizeStruct.new(*bbox_a)
 
       r = Math.sin(45*Math::PI/180)*bbox_a.min
       rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
