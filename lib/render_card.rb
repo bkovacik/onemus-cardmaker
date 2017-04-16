@@ -162,36 +162,16 @@ class CardRenderer
 
       temp.resize!(size['x'], size['y'])
 
-      pos = relative_to_value(drawHash, field, card)
-
-      rotate_image!(field, temp)
-
-      r = Math.sin(45*Math::PI/180)*size.values.min
-      rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
-
-      adjust_size!(size, field['rotate'])
-      min_axis = size.values.min
-
-      drawHash[name] = SizeStruct.new(temp.columns, temp.rows)
-
-      image.composite!(
-        temp,
-        pos['x'] - min_axis/2 + r*Math.cos(rad),
-        pos['y'] - min_axis/2 + r*Math.sin(rad),
-        OverCompositeOp
-      )
+      position_image!(image, temp, drawHash, name, field, card)
     end
 
     # Draws rectangle on image
     # Mutates image
     def draw_rect!(name, field, image, card, drawHash, shape)
-      color = field['color']
-      d = Draw.new
-      d.fill = @globals[color] ?
-        @globals[color] : @aspects[card['aspect']]['color'][color]
+p name
+      d = create_new_drawing(name, field, card)
 
       pos = relative_to_value(drawHash, field, card)
-
       rotate_drawing!(field, d, pos)
 
       case field['type']
@@ -221,12 +201,7 @@ class CardRenderer
     # Draws n-gon on image
     # Mutates image
     def draw_poly!(name, field, image, card, drawHash, n)
-      color = field['color']
-      d = Draw.new
-      if (field['color'])
-        d.fill = @globals[color] ?
-          @globals[color] : @aspects[card['aspect']]['color'][color]
-      end
+      d = create_new_drawing(name, field, card)
 
       n = n.to_i
       side = field['side']*@dpi
@@ -309,36 +284,9 @@ class CardRenderer
         d.font = font 
       end
 
-      @symbols.each do |symbol|
-        if (symbol['image'] and symbol['fields'].include?(name))
-          temp = []
-
-          text.each_with_index do |token, i|
-            if (token.class == Image)
-              temp.push(token)
-            elsif (!token.empty?)
-              tokens = token.split(/(#{symbol['symbol']})/)
-              temp.push(*tokens)
-            end
-          end
-
-          imagepath = @images + symbol['replace']
-
-          m = Image.ping(imagepath).first
-          replace_image = Image.read(imagepath).first
-
-          text = temp.flatten.map { |x| 
-            if (x == symbol['symbol']) 
-              replace_image
-            else
-              x
-            end
-          }
-        end
-      end
-
       il = ImageList.new
 
+      text = replace_with_symbols(text, name)
       text.delete('')
 
       fontsize = field['textsize'] ?
@@ -346,7 +294,6 @@ class CardRenderer
       d.pointsize = fontsize
 
       height = d.get_type_metrics('.').height
-      #min = tt.measurements['rows']
       textlength = 0
 
       text.each_with_index do |item, i|
@@ -372,29 +319,7 @@ class CardRenderer
       lines.each_with_index do |line, i|
         tempimlist = ImageList.new
 
-        line.each do |item|
-          im = nil
-
-          if (item.class == Image)
-            im = item.resize(scale)
-            im.background_color = 'transparent'
-          else
-            metrics = d.get_type_metrics(item)
-
-            im = Image.new(
-              metrics.width,
-              metrics.height
-            ) {
-              self.background_color = 'transparent'
-            }
-
-            dr = d.clone
-            dr.text(0, 0, item)
-            dr.draw(im)
-          end
-
-          tempimlist << im
-        end
+        populate_imglist!(line, tempimlist, d, scale)
 
         tempimg = tempimlist.append(false)
         case field['align']
@@ -426,25 +351,10 @@ class CardRenderer
         tempimlist.destroy!
       end
 
-      pos = relative_to_value(drawHash, field, card, 10)
       output = il.append(true)
       il.destroy!
 
-      rotate_image!(field, output)
-
-      bbox_a = [output.columns, output.rows]
-      drawHash[name] = SizeStruct.new(*bbox_a)
-
-      r = Math.sin(45*Math::PI/180)*bbox_a.min
-      rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
-      min_axis = bbox_a.min
-
-      image.composite!(
-        output,
-        pos['x'] - min_axis/2 + r*Math.cos(rad),
-        pos['y'] - min_axis/2 + r*Math.sin(rad),
-        OverCompositeOp
-      )
+      position_image!(image, output, drawHash, name, field, card)
     end
 
     # Rotates drawing and translates coordinates back to "normal"
@@ -471,7 +381,7 @@ class CardRenderer
     # Mutates image
     def rotate_image!(field, image)
       if (field['rotate'])
-        image.background_color = 'none'
+        image.background_color = 'transparent'
         image.rotate!(field['rotate'])
       end
     end
@@ -673,5 +583,108 @@ class CardRenderer
         r: r,
         apothem: apothem
       }
+    end
+
+    # Takes in array containing a string and the name of the field
+    # Returns array of text and symbols 
+    def replace_with_symbols(text, name)
+      @symbols.each do |symbol|
+        if (symbol['image'] and symbol['fields'].include?(name))
+          temp = []
+
+          text.each_with_index do |token, i|
+            if (token.class == Image)
+              temp.push(token)
+            elsif (!token.empty?)
+              tokens = token.split(/(#{symbol['symbol']})/)
+              temp.push(*tokens)
+            end
+          end
+
+          imagepath = @images + symbol['replace']
+
+          m = Image.ping(imagepath).first
+          replace_image = Image.read(imagepath).first
+
+          text = temp.flatten.map { |x| 
+            if (x == symbol['symbol']) 
+              replace_image
+            else
+              x
+            end
+          }
+        end
+      end
+
+      return text
+    end
+
+    # Takes in a line and an image list to populate with token images from the line
+    # Mutates tempimlist
+    def populate_imglist!(line, tempimlist, d, scale)
+      line.each do |item|
+        im = nil
+
+        if (item.class == Image)
+          im = item.resize(scale)
+          im.background_color = 'transparent'
+        else
+          metrics = d.get_type_metrics(item)
+
+          im = Image.new(
+            metrics.width,
+            metrics.height
+          ) {
+            self.background_color = 'transparent'
+          }
+
+          dr = d.clone
+          dr.text(0, 0, item)
+          dr.draw(im)
+        end
+
+        tempimlist << im
+      end
+    end
+
+    # Positions to_position on other image and takes care of rotation etc.
+    # Mutates image
+    def position_image!(image, to_position, drawHash, name, field, card)
+      if (field['lineheight'])
+        pos = relative_to_value(drawHash, field, card, field['lineheight'])
+      else
+        pos = relative_to_value(drawHash, field, card)
+      end
+
+      rotate_image!(field, to_position)
+
+      bbox_a = [to_position.columns, to_position.rows]
+      drawHash[name] = SizeStruct.new(*bbox_a)
+
+      r = Math.sin(45*Math::PI/180)*bbox_a.min
+      rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
+      min_axis = bbox_a.min
+
+      image.composite!(
+        to_position,
+        pos['x'] - min_axis/2 + r*Math.cos(rad),
+        pos['y'] - min_axis/2 + r*Math.sin(rad),
+        OverCompositeOp
+      )
+    end
+
+    # Creates a new drawing, taking care of boilerplate
+    # Returns new drawing
+    def create_new_drawing(name, field, card)
+      d = Draw.new
+
+      if (field['color'])
+        color = field['color']
+
+        d.fill = @globals[color] ?
+          @globals[color] : @aspects[card['aspect']]['color'][color]
+      end
+
+      return d
     end
 end
