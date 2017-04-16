@@ -224,8 +224,8 @@ class CardRenderer
       color = field['color']
       d = Draw.new
       if (field['color'])
-        d.fill = @globals[color].nil? ?
-          @aspects[card['aspect']]['color'][color] : @globals[color]
+        d.fill = @globals[color] ?
+          @globals[color] : @aspects[card['aspect']]['color'][color]
       end
 
       n = n.to_i
@@ -341,8 +341,8 @@ class CardRenderer
 
       text.delete('')
 
-      fontsize = field['textsize'].nil? ?
-        DEFAULT_TEXT_SIZE*@dpi : field['textsize']*@dpi
+      fontsize = field['textsize'] ?
+        field['textsize']*@dpi : DEFAULT_TEXT_SIZE*@dpi
       d.pointsize = fontsize
 
       height = d.get_type_metrics('.').height
