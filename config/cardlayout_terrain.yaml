@@ -14,16 +14,18 @@ layout:
       round: 0.1
 
     background:
-      type: 6gon
+      type: aspect_icon
       x: 0.1
       y: 0.1
       sizex: 1.4
       sizey: 1.2
       side: 0.67
       color: base
-#      poly-mask: 6
-#      images:
-#        c: terrain.png
+      combine: 'overlay'
+      poly-mask: 6
+      images:
+        c: terrain.png
+        n: terrain.png
 
     name:
       type: text

@@ -160,6 +160,19 @@ class CardRenderer
         temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
 
+      if (field['color'])
+        background = Image.new(temp.columns, temp.rows) {
+          self.background_color = 'transparent'
+        }
+        temp_dr = create_new_drawing(field, card)
+
+        temp_dr.rectangle(0, 0, temp.columns, temp.rows)
+        temp_dr.draw(background)
+
+        background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
+        temp = background.composite!(temp, Magick::CenterGravity, string_to_copyop(field['combine']))
+      end
+
       temp.resize!(size['x'], size['y'])
 
       position_image!(image, temp, drawHash, name, field, card)
@@ -168,8 +181,7 @@ class CardRenderer
     # Draws rectangle on image
     # Mutates image
     def draw_rect!(name, field, image, card, drawHash, shape)
-p name
-      d = create_new_drawing(name, field, card)
+      d = create_new_drawing(field, card)
 
       pos = relative_to_value(drawHash, field, card)
       rotate_drawing!(field, d, pos)
@@ -201,7 +213,7 @@ p name
     # Draws n-gon on image
     # Mutates image
     def draw_poly!(name, field, image, card, drawHash, n)
-      d = create_new_drawing(name, field, card)
+      d = create_new_drawing(field, card)
 
       n = n.to_i
       side = field['side']*@dpi
@@ -312,7 +324,7 @@ p name
       scale = [scale, 1].min
 
       d.pointsize = fontsize*scale
-      d.gravity = SouthWestGravity
+      d.gravity = Magick::SouthWestGravity
 
       lines = break_text_with_image(field['sizex']*@dpi, text, d)
 
@@ -675,7 +687,7 @@ p name
 
     # Creates a new drawing, taking care of boilerplate
     # Returns new drawing
-    def create_new_drawing(name, field, card)
+    def create_new_drawing(field, card)
       d = Draw.new
 
       if (field['color'])
@@ -686,5 +698,21 @@ p name
       end
 
       return d
+    end
+
+    # Returns a Magick version of a composite operator
+    def string_to_copyop(str)
+      case str
+        when 'burn'
+          return Magick::ColorBurnCompositeOp
+        when 'dodge'
+          return Magick::ColorDodgeCompositeOp
+        when 'hardlight'
+          return Magick::HardLightCompositeOp
+        when 'overlay'
+          return Magick::OverlayCompositeOp
+        when 'softlight'
+          return Magick::SoftLightCompositeOp
+      end
     end
 end
