@@ -2,6 +2,7 @@ require 'optparse'
 
 class DefineOptions
   Dimension = Struct.new(:x, :y)
+  Padding = String.new
 
   def initialize(options)
     ARGV << '-h' if ARGV.empty?
@@ -14,12 +15,14 @@ class DefineOptions
         '--symbols=/symbols.yaml',
         '--images=images/',
         '--statictext=/statictext.yaml',
-        '--outdir=../output/'
+        '--outdir=../output/',
+        '--padding=+2+2'
       ] + ARGV
 
       opts.banner = "Usage: cardmaker(.rb) [options]\nAll paths are relative!"
 
       opts.accept(Dimension, /(\d+x\d+|\d+x|x\d+)/)
+      opts.accept(Padding, /(\+\d+\+\d+)/)
 
       opts.on('--name=NAME', String, 'Name of Google Drive document') do |n|
         options['name'] = n
@@ -49,7 +52,7 @@ class DefineOptions
         options['statictext'] = t
       end
 
-      opts.on('-o', '--outdir=OUTDIR', String, 'Output directory') do |o|
+      opts.on('-o=OUTDIR', '--outdir=OUTDIR', String, 'Output directory') do |o|
         options['outdir'] = o
       end
 
@@ -67,6 +70,10 @@ class DefineOptions
 
       opts.on('--tile=DIMENSION', Dimension, 'How cards are arranged in output') do |t|
         options['tile'] = t
+      end
+
+      opts.on('--pad=PADDING', '--padding=PADDING', Padding, 'Padding around the cards') do |p|
+        options['padding'] = p
       end
 
       opts.on('-p', '--print', 'Output cards in sheet form') do |p|

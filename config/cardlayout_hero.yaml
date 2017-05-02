@@ -1,5 +1,5 @@
 layout:
-  dpi: 150
+  dpi: 300
   x: 5.0
   y: 3.5
   font: OLDSH__
@@ -16,12 +16,31 @@ layout:
       color: border 
 
     background:
-      type: rect
+      type: icon
       x: 0.15
       y: 0.15
       sizex: 4.7
       sizey: 3.2
-      color: base 
+      image: base_background.png
+      color: base
+      combine: overlay
+
+    background_overlay:
+      type: aspect_icon
+      x: 0.15
+      y: 0.15
+      sizex: 4.7
+      sizey: 3.2
+      images:
+        c: anger_overlay.png 
+        n: anger_overlay.png 
+        a: apathy_overlay.png 
+        e: entropy_overlay.png 
+        g: greed_overlay.png 
+        o: anger_overlay.png 
+        p: anger_overlay.png 
+      color: base
+      combine: overlay
 
     name:
       type: text

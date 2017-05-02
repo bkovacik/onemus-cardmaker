@@ -19,6 +19,8 @@ class CardRenderer
     @images = args['images']
     @outdir = args['outdir']
 
+    @padding = args['padding']
+
     @imageCache = {}
 
     @dpi = args['dpi'] ? args['dpi'] : @layout['dpi']
@@ -72,9 +74,12 @@ class CardRenderer
     end
 
     tile = @tile
+    cardX = @cardX
+    cardY = @cardY
+    padding = @padding
 
     imageList.montage{
-      self.geometry = "#{@cardX}x#{@cardY}+2+2"
+      self.geometry = "#{cardX}x#{cardY}#{padding}"
       self.tile = tile
     }.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
@@ -180,7 +185,7 @@ class CardRenderer
 
     # Draws rectangle on image
     # Mutates image
-    def draw_rect!(name, field, image, card, drawHash, shape)
+    def draw_rect!(name, field, image, card, drawHash)
       d = create_new_drawing(field, card)
 
       pos = relative_to_value(drawHash, field, card)
@@ -286,7 +291,7 @@ class CardRenderer
 
       return if text.first.nil?
 
-      d = Draw.new 
+      d = create_new_drawing(field, card)
       font = FONT_DIR +
         (field['font'].nil? ? @layout['font'] : field['font']) +
         '.ttf'
