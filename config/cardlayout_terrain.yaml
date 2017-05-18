@@ -1,7 +1,7 @@
 layout:
   dpi: 150
-  x: 1.6
-  y: 1.4
+  x: 3
+  y: 2.65
   font: OLDSH__
 
   fields:
@@ -9,23 +9,35 @@ layout:
       type: 6gon
       x: 0
       y: 0
-      side: 0.78
+      side: 1.5
       color: border
       round: 0.1
 
     background:
-      type: aspect_icon
+      type: icon
       x: 0.1
       y: 0.1
-      sizex: 1.4
-      sizey: 1.2
-      side: 0.67
+      sizex: 4
+      sizey: 2.5
+      side: 1.5
       color: base
       combine: 'overlay'
       poly-mask: 6
-      images:
-        c: terrain.png
-        n: terrain.png
+      image: base_background.png
+      crop: true
+
+    background_overlay:
+      type: icon
+      x: 0.1
+      y: 0.1
+      sizex: 3
+      sizey: 2.5
+      side: 1.5
+      color: base
+      combine: 'overlay'
+      poly-mask: 6
+      image: anger_overlay.png
+      crop: true
 
     name:
       type: text

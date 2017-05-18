@@ -2,7 +2,7 @@ require 'rmagick'
 require 'yaml'
 include Magick
 
-DEFAULT_TEXT_SIZE = 0.15
+DEFAULT_TEXT_SIZE = 0.12
 FONT_DIR = 'C:/Windows/Fonts/'
 
 SizeStruct = Struct.new(:sizex, :sizey) do
@@ -78,10 +78,14 @@ class CardRenderer
     cardY = @cardY
     padding = @padding
 
-    imageList.montage{
+    output = imageList.montage{
       self.geometry = "#{cardX}x#{cardY}#{padding}"
       self.tile = tile
-    }.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
+    }
+    output.units = Magick::PixelsPerInchResolution
+    output.x_resolution = @dpi
+
+    output.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
 
   private
@@ -142,7 +146,24 @@ class CardRenderer
         end
       end
 
-      temp.resize!(size['x'], size['y'])
+      if (field['crop'])
+        temp.resize_to_fill!(size['x'], size['y'], Magick::WestGravity)
+      else
+        temp.resize!(size['x'], size['y'])
+      end
+
+      if (field['color'])
+        background = Image.new(temp.columns, temp.rows) {
+          self.background_color = 'transparent'
+        }
+        temp_dr = create_new_drawing(field, card)
+
+        temp_dr.rectangle(0, 0, temp.columns, temp.rows)
+        temp_dr.draw(background)
+
+        background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
+        temp = background.composite!(temp, Magick::CenterGravity, string_to_copyop(field['combine']))
+      end
 
       if (field['poly-mask'])
         mask = Image.new(size['x'], size['y']) {
@@ -164,21 +185,6 @@ class CardRenderer
 
         temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
-
-      if (field['color'])
-        background = Image.new(temp.columns, temp.rows) {
-          self.background_color = 'transparent'
-        }
-        temp_dr = create_new_drawing(field, card)
-
-        temp_dr.rectangle(0, 0, temp.columns, temp.rows)
-        temp_dr.draw(background)
-
-        background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
-        temp = background.composite!(temp, Magick::CenterGravity, string_to_copyop(field['combine']))
-      end
-
-      temp.resize!(size['x'], size['y'])
 
       position_image!(image, temp, drawHash, name, field, card)
     end

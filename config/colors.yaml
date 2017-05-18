@@ -30,7 +30,7 @@ aspects:
   o:
     name: order
     color:
-      base: '#efa200'
+      base: '#dfa232'
       text: '#000'
 
   p:
@@ -42,5 +42,5 @@ aspects:
   c:
     name: colorless
     color:
-      base: '#FFF'
-      text: '#000'
+      base: '#CCC'
+      text: '#444'

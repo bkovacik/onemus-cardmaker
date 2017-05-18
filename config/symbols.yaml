@@ -29,8 +29,62 @@ symbols:
     fields:
       - ability
 
-  - symbol: "`b"
-    replace: weapon.png
+  - symbol: "`c"
+    replace: colorless_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`n"
+    replace: anger_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`a"
+    replace: apathy_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`e"
+    replace: entropy_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`g"
+    replace: greed_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`o"
+    replace: order_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`p"
+    replace: pride_orb.png 
     image: true
     fields:
       - ability

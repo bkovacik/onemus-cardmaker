@@ -37,8 +37,8 @@ layout:
         a: apathy_overlay.png 
         e: entropy_overlay.png 
         g: greed_overlay.png 
-        o: anger_overlay.png 
-        p: anger_overlay.png 
+        o: order_overlay.png 
+        p: pride_overlay.png 
       color: base
       combine: overlay
 
@@ -57,6 +57,7 @@ layout:
       y: 0.4
       sizex: 2.1
       color: text
+      textsize: 0.17
       align: center
 
     class:
@@ -74,59 +75,97 @@ layout:
       y: 1.4
       sizex: 2.0
       color: text
+      textsize: 0.15
+
+    ability_name_1:
+      type: text
+      x: 2.3
+      y: 0.4
+      sizex: 1.0
+      sizey: 0.2
+      color: text
+      textsize: 0.15
+
+    ability_tier_1:
+      type: text
+      x: 3.8
+      y: 0.4
+      sizex: 0.2
+      sizey: 0.2
+      color: text
+      textsize: 0.15
 
     ability_1:
       type: text 
-      x: 2.8 
-      y: 0.4
-      sizex: 1.8
+      x: 2.3 
+      y: ability_name_1.y
+      sizex: 2.3
       sizey: 1.4
       color: text
-      
+
+    ability_name_2:
+      type: text
+      x: 2.3
+      y: ability_1.y
+      sizex: 1.0
+      sizey: 0.2
+      color: text
+      textsize: 0.15
+
+    ability_tier_2:
+      type: text
+      x: 3.8
+      y: ability_1.y
+      sizex: 0.3
+      sizey: 0.2
+      color: text
+      textsize: 0.15
+
     ability_2:
       type: text 
-      x: 2.8 
-      y: ability_1.y
-      sizex: 1.8
+      x: 2.3 
+      y: ability_name_2.y
+      sizex: 2.3
       sizey: 1.4
       color: text
+
+    ability_name_3:
+      type: text
+      x: 2.3
+      y: ability_2.y
+      sizex: 1.0
+      sizey: 0.2
+      color: text
+      textsize: 0.15
+
+    ability_tier_3:
+      type: text
+      x: 3.8
+      y: ability_2.y
+      sizex: 0.2
+      sizey: 0.2
+      color: text
+      textsize: 0.15
 
     ability_3:
       type: text 
-      x: 2.8 
-      y: ability_2.y
-      sizex: 1.8
+      x: 2.3
+      y: ability_name_3.y
+      sizex: 2.3
       sizey: 1.4
       color: text
-
-    ability:
-      type: text 
-      x: 0.3
-      y: 2.0
-      sizex: 1.85
-      sizey: 1.2
-      color: text
-
-    mercenary:
-      type: static
-      class: Mercenary
-      x: 0.3
-      y: ability.y 
-      sizex: 1.85
-      color: text
-      text: mercenary
 
     attack:
       type: text 
       x: 2.0
-      y: 3.3
+      y: 3.1
       sizex: 1.8
       color: text
 
     hp:
       type: text 
       x: 2.2
-      y: 3.3
+      y: 3.1
       sizex: 1.8
       color: text
 
