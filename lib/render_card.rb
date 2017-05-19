@@ -167,7 +167,7 @@ class CardRenderer
 
       if (field['poly-mask'])
         mask = Image.new(size['x'], size['y']) {
-          self.background_color = 'transparent'
+          self.background_color = 'white'
         }
 
         draw_poly!(
@@ -183,6 +183,14 @@ class CardRenderer
           field['poly-mask']
         )
 
+        mask.alpha = Magick::DeactivateAlphaChannel
+        mask = mask.negate
+
+        temp_mask = temp.channel(Magick::OpacityChannel)
+        temp_mask = temp_mask.negate
+
+        mask.composite!(temp_mask, Magick::CenterGravity, Magick::MultiplyCompositeOp)
+        
         temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
 

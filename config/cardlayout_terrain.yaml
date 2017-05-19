@@ -17,7 +17,7 @@ layout:
       type: icon
       x: 0.1
       y: 0.1
-      sizex: 4
+      sizex: 3
       sizey: 2.5
       side: 1.5
       color: base
@@ -36,7 +36,7 @@ layout:
       color: base
       combine: 'overlay'
       poly-mask: 6
-      image: anger_overlay.png
+      image: colorless_overlay.png
       crop: true
 
     name:
