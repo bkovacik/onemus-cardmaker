@@ -15,11 +15,11 @@ layout:
 
     background:
       type: icon
-      x: 0.1
-      y: 0.1
-      sizex: 3
-      sizey: 2.5
-      side: 1.5
+      x: 0.15
+      y: 0.15
+      sizex: 2.85
+      sizey: 2.35
+      side: 1.35
       color: base
       combine: 'overlay'
       poly-mask: 6
@@ -28,26 +28,26 @@ layout:
 
     background_overlay:
       type: icon
-      x: 0.1
-      y: 0.1
-      sizex: 3
-      sizey: 2.5
-      side: 1.5
+      x: 0.15
+      y: 0.15
+      sizex: 2.85
+      sizey: 2.35
+      side: 1.35
       color: base
       combine: 'overlay'
       poly-mask: 6
-      image: colorless_overlay.png
+      image: colorless_overlay_spell.png
       crop: true
 
     name:
       type: text
-      x: 0.4
+      x: 1
       y: 0.2
       sizex: 0.7
-      sizey: 0.14
+      sizey: 0.2
       align: center
       color: text
-      textsize: 0.14
+      textsize: 0.18
       font: Livingst
 
     ability:

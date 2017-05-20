@@ -353,6 +353,7 @@ class CardRenderer
         populate_imglist!(line, tempimlist, d, scale)
 
         tempimg = tempimlist.append(false)
+
         case field['align']
           when 'center'
             pad = ((field['sizex']*@dpi) - tempimg.columns)/2
@@ -494,12 +495,11 @@ class CardRenderer
         itemlength = item.class == Image ?
           item.columns : draw.get_type_metrics(item + ' ').width
 
-        if (itemlength + linelength > width)
-          result << line
-          line = [item]
-          linelength = itemlength
-        else
-          if (!line.empty?)
+        if (!line.empty?)
+          if (itemlength + linelength > width)
+            result << line
+            line = [item]
+          else
             t = line.pop
 
             if (t.class != Image)
@@ -513,12 +513,12 @@ class CardRenderer
             else
               line << t + item
             end
-          else
-            line << item
           end
-
-          linelength += itemlength
+        else
+          line << item
         end
+
+        linelength += itemlength
       end
 
       unless (line.empty?)
