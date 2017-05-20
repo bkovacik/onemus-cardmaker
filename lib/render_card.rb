@@ -499,6 +499,7 @@ class CardRenderer
           if (itemlength + linelength > width)
             result << line
             line = [item]
+            linelength = 0
           else
             t = line.pop
 

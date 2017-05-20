@@ -41,9 +41,9 @@ layout:
 
     name:
       type: text
-      x: 1
+      x: 0.8
       y: 0.2
-      sizex: 0.7
+      sizex: 1.4
       sizey: 0.2
       align: center
       color: text
