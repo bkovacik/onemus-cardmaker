@@ -1,6 +1,6 @@
 onemus-cardmaker scrapes a google doc and outputs cards.
 
-#Installation
+# Installation
 Grab the sourcecode and run
 ```
 bundle install

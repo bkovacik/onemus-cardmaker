@@ -36,26 +36,26 @@ layout:
       color: base
       combine: 'overlay'
       poly-mask: 6
-      image: colorless_overlay_spell.png
+      image: terrain_overlay.png
       crop: true
 
     name:
       type: text
-      x: 0.8
-      y: 0.2
-      sizex: 1.4
-      sizey: 0.2
+      x: 0.55
+      y: 0.6
+      sizex: 1.9
+      sizey: 0.3
       align: center
       color: text
-      textsize: 0.18
+      textsize: 0.3
       font: Livingst
 
     ability:
       type: text
-      x: 0.25
-      y: 0.6
-      sizex: 1.1
-      sizey: 0.45
+      x: 0.8
+      y: 1
+      sizex: 1.35
+      sizey: 1.25
       align: center
       color: text
-      textsize: 0.11
+      textsize: 0.15

@@ -34,7 +34,7 @@ layout:
       sizey: 3.2
       crop: true
       images:
-        c: colorless_overlay.png 
+        c: colorless_overlay_spell.png 
         n: anger_overlay.png 
         a: apathy_overlay.png 
         e: entropy_overlay.png 

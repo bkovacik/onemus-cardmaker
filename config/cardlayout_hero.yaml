@@ -81,7 +81,7 @@ layout:
       type: text
       x: 2.3
       y: 0.4
-      sizex: 1.0
+      sizex: 1.5
       sizey: 0.2
       color: text
       textsize: 0.15
@@ -107,7 +107,7 @@ layout:
       type: text
       x: 2.3
       y: ability_1.y
-      sizex: 1.0
+      sizex: 1.5
       sizey: 0.2
       color: text
       textsize: 0.15
@@ -133,7 +133,7 @@ layout:
       type: text
       x: 2.3
       y: ability_2.y
-      sizex: 1.0
+      sizex: 1.5
       sizey: 0.2
       color: text
       textsize: 0.15
