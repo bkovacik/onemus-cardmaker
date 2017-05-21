@@ -76,6 +76,10 @@ class DefineOptions
         options['padding'] = p
       end
 
+      opts.on('--nogen', "Don't generate card images") do |n|
+        options['nogen'] = n
+      end
+
       opts.on('-p', '--print', 'Output cards in sheet form') do |p|
         options['print'] = true
       end

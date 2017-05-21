@@ -2,6 +2,7 @@ require 'google_drive'
 require 'fileutils'
 require_relative 'read_worksheet'
 require_relative 'render_card'
+require_relative 'render_cardlist'
 require_relative 'symbol_replace'
 require_relative 'define_options'
 
@@ -28,20 +29,25 @@ end
 r = CardRenderer.new(options)
 
 if options['clean']
-  FileUtils.rm_rf(Dir['./output/*'])
+  outpath = File.expand_path(options['outdir'] + '/*', File.dirname(__FILE__))
+  FileUtils.rm_rf(Dir[outpath])
 end
 
-cards.each do |title, card|
-  print "\n#{title} ======\n" if options['verbose']
+unless options['nogen']
+  cards.each do |title, card|
+    print "\n#{title} ======\n" if options['verbose']
 
-  card.each do |t, c|
-    print "#{t}\n" if options['verbose']
+    card.each do |t, c|
+      print "#{t}\n" if options['verbose']
 
-    r.render_card(c)
+      r.render_card(c)
+    end
   end
 end
 
 if options['print']
+  clr = CardListRenderer.new(options)
+
   FileUtils.mkdir_p('./output/output')
-  r.render_cardlist('/output/output.png')
+  clr.render_cardlist('/output/output.png')
 end

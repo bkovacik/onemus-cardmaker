@@ -13,25 +13,19 @@ class CardRenderer
     confdir = File.expand_path('../config', File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args['colors'])
     @layout = YAML.load_file(confdir + args['cardlayout'])['layout']
-    @cardList = YAML.load_file(confdir + args['cardlist'])
     @symbols = YAML.load_file(confdir + args['symbols'])['symbols']
     @statictext = YAML.load_file(confdir + args['statictext'])['texts']
     @images = args['images']
-    @outdir = args['outdir']
-
-    @padding = args['padding']
-
-    @imageCache = {}
 
     @dpi = args['dpi'] ? args['dpi'] : @layout['dpi']
+
+    @outdir = args['outdir']
 
     @aspects = @colors['aspects']
 
     @globals = @colors['globals']
 
     @fields = @layout['fields'] 
-
-    @tile = args['tile']
 
     @cardX = (@layout['x'] * @dpi).floor
     @cardY = (@layout['y'] * @dpi).floor
@@ -57,35 +51,6 @@ class CardRenderer
 
     outpath = File.expand_path(@outdir + name, File.dirname(__FILE__))
     c.write(outpath)
-  end
-
-  def render_cardlist(name)
-    imageList = ImageList.new
-
-    index = 0
-    @cardList['cards'].each do |card|
-      (1..card['copies']).each do |copy|
-        if (@imageCache[card['name']].nil?)
-          raise "No image for card #{card['name']} found!"
-        end
-
-        imageList << @imageCache[card['name']]
-      end
-    end
-
-    tile = @tile
-    cardX = @cardX
-    cardY = @cardY
-    padding = @padding
-
-    output = imageList.montage{
-      self.geometry = "#{cardX}x#{cardY}#{padding}"
-      self.tile = tile
-    }
-    output.units = Magick::PixelsPerInchResolution
-    output.x_resolution = @dpi
-
-    output.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
 
   private
@@ -503,14 +468,11 @@ class CardRenderer
           else
             t = line.pop
 
-            if (t.class != Image)
-              t += ' '
-            end
+            t += ' ' if (t.class != Image)
             
             if (t.class == Image or item.class == Image)
               line << t << item
 
-              line << ' ' if (i != tokens.length - 1)
             else
               line << t + item
             end
