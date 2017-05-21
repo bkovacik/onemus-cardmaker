@@ -72,10 +72,13 @@ class CardRenderer
     def draw!(image, card) 
       drawHash = {};
 
-      @fields.each do |name, field|
-        d = Draw.new
-        color = field['color']
-        pos = {}
+      sorted_keys = @fields.keys.sort_by do |key|
+        @fields[key]['z-index'] = 0 unless @fields[key]['z-index']
+        @fields[key]['z-index']
+      end
+
+      sorted_keys.each do |name|
+        field = @fields[name]
 
         # defaults
         unless (aspect = card['aspect']) then card['aspect'] = 'c' end

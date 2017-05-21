@@ -25,6 +25,7 @@ layout:
       image: base_background.png
       color: base
       combine: overlay
+      z-index: 1
 
     background_overlay:
       type: aspect_icon
@@ -43,6 +44,7 @@ layout:
         p: pride_overlay.png 
       color: base
       combine: overlay
+      z-index: 2
 
     name:
       type: text
@@ -52,6 +54,7 @@ layout:
       color: text
       textsize: 0.2
       font: Livingst
+      z-index: 3
 
     title:
       type: text
@@ -60,6 +63,7 @@ layout:
       sizex: 2.1
       color: text
       align: center
+      z-index: 3
 
     class:
       type: text 
@@ -69,6 +73,7 @@ layout:
       color: text
       rotate: 270
       align: right
+      z-index: 3
 
     chroma_ability:
       type: text 
@@ -76,6 +81,7 @@ layout:
       y: 1.4
       sizex: 2.0
       color: text
+      z-index: 3
 
     ability:
       type: text 
@@ -84,6 +90,7 @@ layout:
       sizex: 1.85
       sizey: 1.0
       color: text
+      z-index: 3
 
 #    mercenary:
 #      type: static
@@ -100,6 +107,7 @@ layout:
       y: 3.1
       sizex: 1.8
       color: text
+      z-index: 3
 
     hp:
       type: text 
@@ -107,6 +115,7 @@ layout:
       y: 3.1
       sizex: 1.8
       color: text
+      z-index: 3
 
     cost:
       type: text
@@ -114,6 +123,7 @@ layout:
       y: 0.5
       sizex: 1.8
       color: text
+      z-index: 3
 
     units:
       type: text
@@ -121,3 +131,4 @@ layout:
       y: 3.1
       sizex: 1.8
       color: text
+      z-index: 3
