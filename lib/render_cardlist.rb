@@ -16,9 +16,9 @@ class CardListRenderer
     @outpath = File.expand_path(args['outdir'] + '/*.png', File.dirname(__FILE__))
 
     @imageCache = {}
-    Dir[@outpath].each{ |x|
+    Dir[@outpath].each do |x|
       @imageCache[x[/.*\/(.*)\.png/, 1]] = Image.read(x).first
-    }
+    end
   end
 
   def render_cardlist(name)

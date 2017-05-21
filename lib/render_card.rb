@@ -12,23 +12,36 @@ class CardRenderer
   def initialize(args)
     confdir = File.expand_path('../config', File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args['colors'])
-    @layout = YAML.load_file(confdir + args['cardlayout'])['layout']
+
+    cardlayout = YAML.load_file(confdir + args['cardlayout'])
+    layout = cardlayout['layout']
+    requires = cardlayout['requires']
+
+    @dpi = args['dpi'] ? args['dpi'] : layout['dpi']
+
+    @fields = layout['fields'] 
+    @cardX = (layout['x'] * @dpi).floor
+    @cardY = (layout['y'] * @dpi).floor
+    @font = layout['font']
+
+    if requires
+      requires.each do |r|
+        to_merge = YAML.load_file(confdir + r)['layout']['fields']
+        @fields.merge!(to_merge) do |key,oldvalue,newvalue|
+          oldvalue
+        end
+      end
+    end
+
     @symbols = YAML.load_file(confdir + args['symbols'])['symbols']
     @statictext = YAML.load_file(confdir + args['statictext'])['texts']
     @images = args['images']
-
-    @dpi = args['dpi'] ? args['dpi'] : @layout['dpi']
 
     @outdir = args['outdir']
 
     @aspects = @colors['aspects']
 
     @globals = @colors['globals']
-
-    @fields = @layout['fields'] 
-
-    @cardX = (@layout['x'] * @dpi).floor
-    @cardY = (@layout['y'] * @dpi).floor
   end
 
   # Takes in a hash representing a card and outputs an image to the outputs directory
@@ -99,10 +112,10 @@ class CardRenderer
           
       temp = Image.read(imagepath).first
 
-      imageinfo = Image.ping(imagepath).first
-      size = {}
-      size['x'] = imageinfo.columns
-      size['y'] = imageinfo.rows
+      size = {
+        'x' => temp.columns,
+        'y' => temp.rows
+      }
 
       # Resize if size values are present
       ['x', 'y'].each do |a|
@@ -159,7 +172,10 @@ class CardRenderer
         temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
 
+
+    outpath = File.expand_path(@outdir + name + '.png', File.dirname(__FILE__))
       position_image!(image, temp, drawHash, name, field, card)
+image.write(outpath)
     end
 
     # Draws rectangle on image
@@ -272,7 +288,7 @@ class CardRenderer
 
       d = create_new_drawing(field, card)
       font = FONT_DIR +
-        (field['font'].nil? ? @layout['font'] : field['font']) +
+        (field['font'].nil? ? @font : field['font']) +
         '.ttf'
       unless File.file?(font)
         raise "#{font} not found!"
