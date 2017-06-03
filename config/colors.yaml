@@ -13,7 +13,7 @@ aspects:
     name: apathy
     color:
       base: '#777'
-      text: '#FFF'
+      text: '#000'
 
   e:
     name: entropy

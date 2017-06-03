@@ -1,0 +1,20 @@
+requires:
+  - ./cardlayout.yaml
+
+layout:
+  x: 2.5
+  y: 3.5
+  font: OLDSH__
+
+  fields:
+    background_overlay:
+      type: icon
+      x: 0.15
+      y: 0.15
+      sizex: 2.2
+      sizey: 3.2
+      crop: true
+      image: colorless_overlay_spell.png
+      color: base
+      combine: overlay
+      z-index: 2

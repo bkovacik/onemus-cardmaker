@@ -44,7 +44,7 @@ layout:
 
     name:
       type: text
-      x: 1.5
+      x: 0.8
       y: 0.3
       sizex: 2.1
       color: text
@@ -72,7 +72,7 @@ layout:
     chroma_ability:
       type: text 
       x: 0.3 
-      y: 1.4
+      y: 3.05
       sizex: 2.0
       color: text
       textsize: 0.15
@@ -173,12 +173,5 @@ layout:
       type: text
       x: 0.2
       y: 0.5
-      sizex: 1.8
-      color: text
-
-    units:
-      type: text
-      x: 0.2
-      y: 3.3
       sizex: 1.8
       color: text

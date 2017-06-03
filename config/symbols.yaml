@@ -23,12 +23,6 @@ symbols:
     fields:
       - ability
 
-  - symbol: "%"
-    replace: SOTM
-    image: false
-    fields:
-      - ability
-
   - symbol: "`c"
     replace: colorless_orb.png 
     image: true
@@ -85,6 +79,33 @@ symbols:
 
   - symbol: "`p"
     replace: pride_orb.png 
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`v"
+    replace: victory_point.png
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`h"
+    replace: charge.png
+    image: true
+    fields:
+      - ability
+      - ability_1
+      - ability_2
+      - ability_3
+
+  - symbol: "`l"
+    replace: coin.png
     image: true
     fields:
       - ability

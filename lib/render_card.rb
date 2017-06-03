@@ -176,9 +176,7 @@ class CardRenderer
       end
 
 
-    outpath = File.expand_path(@outdir + name + '.png', File.dirname(__FILE__))
       position_image!(image, temp, drawHash, name, field, card)
-image.write(outpath)
     end
 
     # Draws rectangle on image
