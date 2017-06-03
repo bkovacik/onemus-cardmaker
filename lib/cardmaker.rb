@@ -49,5 +49,5 @@ if options['print']
   clr = CardListRenderer.new(options)
 
   FileUtils.mkdir_p('./output/output')
-  clr.render_cardlist('/output/output.png')
+  clr.render_cardlist('/output' + options['cardlistname'])
 end

@@ -12,6 +12,7 @@ class DefineOptions
         '--colors=/colors.yaml',
         '--cardlayout=/cardlayout.yaml',
         '--cardlist=/cardlist.yaml',
+        '--cardlistname=/output.png',
         '--symbols=/symbols.yaml',
         '--images=images/',
         '--statictext=/statictext.yaml',
@@ -34,6 +35,10 @@ class DefineOptions
 
       opts.on('--cardlist=CARDLIST', String, 'Path to cardlist') do |c|
         options['cardlist'] = c
+      end
+
+      opts.on('--cardlistname=CARDLISTNAME', String, 'Name of cardlist') do |c|
+        options['cardlistname'] = c
       end
 
       opts.on('--cardlayout=CARDLAYOUT', String, 'Path to cardlayout') do |c|
