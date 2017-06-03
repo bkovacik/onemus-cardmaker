@@ -467,7 +467,8 @@ class CardRenderer
     # Breaks textarray based on the given width
     # Returns nested array
     def break_text_with_image(width, textarray, draw)
-      tokens = textarray.flat_map{ |x| x.respond_to?(:split) ? x.split(' ') : x }
+      tokens = textarray.flat_map{ |x| x.respond_to?(:split) ? x.split(/ /) : x }
+      tokens = tokens.flat_map{ |x| x.respond_to?(:split) ? x.split(/(?<=\n)/) : x }
 
       result = []
       line = []
@@ -477,7 +478,18 @@ class CardRenderer
         itemlength = item.class == Image ?
           item.columns : draw.get_type_metrics(item + ' ').width
 
-        if (!line.empty?)
+        if (item.class != Image and item.include?("\n"))
+          item.sub!("\n", '')
+          line << item 
+          result << line
+          line = []
+          linelength = 0
+          next
+        end
+
+        if (line.empty?)
+          line << item
+        else
           if (itemlength + linelength > width)
             result << line
             line = [item]
@@ -494,8 +506,6 @@ class CardRenderer
               line << t + item
             end
           end
-        else
-          line << item
         end
 
         linelength += itemlength
