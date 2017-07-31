@@ -10,7 +10,7 @@ end
 
 class CardRenderer
   def initialize(args)
-    confdir = File.expand_path('../config', File.dirname(__FILE__))
+    confdir = File.expand_path('../config' + args['gamedir'], File.dirname(__FILE__))
     @colors = YAML.load_file(confdir + args['colors'])
 
     cardlayout = YAML.load_file(confdir + args['cardlayout'])
@@ -513,7 +513,6 @@ class CardRenderer
       unless (line.empty?)
         result << line
       end
-p result
 
       return result
     end

@@ -9,6 +9,7 @@ class DefineOptions
 
     OptionParser.new do |opts|
       opts.default_argv = [
+        '--gamedir=/onemus',
         '--colors=/colors.yaml',
         '--cardlayout=/cardlayout.yaml',
         '--cardlist=/cardlist.yaml',
@@ -79,6 +80,10 @@ class DefineOptions
 
       opts.on('--pad=PADDING', '--padding=PADDING', Padding, 'Padding around the cards') do |p|
         options['padding'] = p
+      end
+
+      opts.on('--gamedir=DIRECTORY', String, 'Game directory') do |g|
+        options['gamedir'] = g
       end
 
       opts.on('--nogen', "Don't generate card images") do |n|

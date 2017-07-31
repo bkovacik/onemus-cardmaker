@@ -1,8 +1,8 @@
 # Takes in card data and and outputs a version with all the symbols replaced
 # Returns a hash of cards SheetName => CardName => Card
 
-def symbol_replace(cards)
-  confdir = File.expand_path('../config', File.dirname(__FILE__))
+def symbol_replace(cards, args)
+  confdir = File.expand_path('../config' + args['gamedir'], File.dirname(__FILE__))
   s = YAML.load_file(confdir + '/symbols.yaml')
   symbols = s['symbols']
 

@@ -23,7 +23,7 @@ if (options['sheets'])
   worksheets.select! { |sheet| options['sheets'].include?(sheet.title) }
 end
 worksheets.each do |ws|
-  cards = cards.merge(symbol_replace(read_worksheet(ws)))
+  cards = cards.merge(symbol_replace(read_worksheet(ws), options))
 end
 
 r = CardRenderer.new(options)

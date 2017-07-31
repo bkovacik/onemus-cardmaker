@@ -1,5 +1,7 @@
 output/*
 images/*
+config/*
 config.json
 *.swp
 !*.gitkeep
+!config/onemus

@@ -49,5 +49,4 @@ class CardListRenderer
 
     output.write(File.expand_path(@outdir + name, File.dirname(__FILE__)))
   end
-
 end
