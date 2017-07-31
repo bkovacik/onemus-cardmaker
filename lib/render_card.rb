@@ -478,15 +478,6 @@ class CardRenderer
         itemlength = item.class == Image ?
           item.columns : draw.get_type_metrics(item + ' ').width
 
-        if (item.class != Image and item.include?("\n"))
-          item.sub!("\n", '')
-          line << item 
-          result << line
-          line = []
-          linelength = 0
-          next
-        end
-
         if (line.empty?)
           line << item
         else
@@ -508,12 +499,21 @@ class CardRenderer
           end
         end
 
+        if (item.class != Image and item.include?("\n"))
+          line[0].sub!("\n", '')
+          result << line
+          line = []
+          linelength = 0
+          next
+        end
+
         linelength += itemlength
       end
 
       unless (line.empty?)
         result << line
       end
+p result
 
       return result
     end
