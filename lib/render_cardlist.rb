@@ -36,13 +36,7 @@ class CardListRenderer
         imageList << get_image(card['name'])
 
         if (index%cardsPerPage == cardsPerPage - 1)
-          render_page(imageList).write(
-            File.expand_path(
-              @outdir + name + (index/cardsPerPage).to_s + '.png',
-              File.dirname(__FILE__)
-            )
-          )
-
+          render_page(imageList, name, (index/cardsPerPage).to_s)
           imageList.clear()
           GC.start
         end
@@ -51,11 +45,11 @@ class CardListRenderer
       end
     end
 
-    render_page(imageList)
+    render_page(imageList, name, (index/cardsPerPage).to_s)
   end
 
   private
-    def render_page(imageList)
+    def render_page(imageList, name, pageNum)
       tile = @tile
       cardX = @cardX
       cardY = @cardY
@@ -68,7 +62,12 @@ class CardListRenderer
       output.units = Magick::PixelsPerInchResolution
       output.x_resolution = @dpi
 
-      return output
+      output.write(
+        File.expand_path(
+          @outdir + name + pageNum + '.png',
+          File.dirname(__FILE__)
+        )
+      )
     end
 
     def get_image(name)
