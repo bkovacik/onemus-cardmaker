@@ -16,7 +16,7 @@ troops-and-mercenaries:
 	ruby lib/cardmaker.rb --name='Onemus ReAlpha' --cardlayout='\/cardlayout.yaml' -v --dpi=${DPI} --sheets='Troops,Mercenaries'
 
 compile-all:
-	ruby lib/cardmaker.rb --name='Onemus ReAlpha' --cardlist='\/cardlist.yaml' -v --dpi=${DPI} --tile=3x3 --padding='+40+40' --cardlistname='\/output.png' -p --nogen
+	ruby lib/cardmaker.rb --name='Onemus ReAlpha' --cardlist='\/cardlist.yaml' -v --dpi=${DPI} --tile=3x3 --padding='+40+40' --cardlistname='\/output' -p --nogen
 
 all:
 	make heroes
