@@ -1,6 +1,7 @@
 require 'rmagick'
 require 'yaml'
 require 'objspace'
+require 'combine_pdf'
 
 class CardListRenderer
   CACHESIZE = 10
@@ -24,7 +25,7 @@ class CardListRenderer
     end
   end
 
-  def render_cardlist(name)
+  def render_cardlist(name, outdir)
     imageList = ImageList.new
 
     tileX, tileY = /(\d+)x(\d+)/.match(@tile).captures
@@ -32,20 +33,51 @@ class CardListRenderer
 
     index = 0
     @cardList['cards'].each do |card|
-      (1..card['copies']).each do |copy|
+      (1..card['copies']).each_with_index do |copy, index|
         imageList << get_image(card['name'])
 
         if (index%cardsPerPage == cardsPerPage - 1)
-          render_page(imageList, name, (index/cardsPerPage).to_s)
+          render_page(imageList, outdir + name, (index/cardsPerPage).to_s)
           imageList.clear()
+
           GC.start
         end
-
-        index += 1
       end
     end
 
-    render_page(imageList, name, (index/cardsPerPage).to_s)
+    if (imageList.length)
+      render_page(imageList, outdir + name, (index/cardsPerPage).to_s)
+      imageList.clear()
+
+      GC.start
+    end
+  end
+
+  def render_pdf(name, outdir)
+    images = Dir[@outdir + outdir + '/*.png']
+
+    imageDims = images.map do |x|
+      Image.ping(x).first
+    end
+
+    x = imageDims.max_by(&:columns).columns
+    y = imageDims.max_by(&:rows).rows
+
+    pdf = CombinePDF.new
+    images.each_with_index do |image, index|
+      imageData = Image.read(image).first
+
+      pdfName = image.sub('.png', '.pdf')
+      imageData.border((x-imageData.columns)/2, (y-imageData.rows)/2, 'white')
+        .write(pdfName)
+
+      pdf << CombinePDF.load(pdfName)
+
+      imageData = nil
+      GC.start
+    end
+
+    pdf.save(@outdir + outdir + '/output.pdf')
   end
 
   private

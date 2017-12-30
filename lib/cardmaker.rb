@@ -48,6 +48,11 @@ end
 if options['print']
   clr = CardListRenderer.new(options)
 
-  FileUtils.mkdir_p('./output/output')
-  clr.render_cardlist('/output' + options['cardlistname'])
+  outdir = '/output'
+  FileUtils.mkdir_p('./output' + outdir)
+  clr.render_cardlist(options['cardlistname'], outdir)
+
+  if options['pdf']
+    clr.render_pdf(options['cardlistname'], outdir)
+  end
 end

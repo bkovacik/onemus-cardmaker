@@ -13,7 +13,7 @@ class DefineOptions
         '--colors=/colors.yaml',
         '--cardlayout=/cardlayout.yaml',
         '--cardlist=/cardlist.yaml',
-        '--cardlistname=/output.png',
+        '--cardlistname=/output',
         '--symbols=/symbols.yaml',
         '--images=images/',
         '--statictext=/statictext.yaml',
@@ -62,10 +62,6 @@ class DefineOptions
         options['outdir'] = o
       end
 
-      opts.on('-c', '--clean', 'Clean directory before exporting') do |c|
-        options['clean'] = c
-      end
-
       opts.on('--sheets=SHEETS', Array, 'Which sheets to export. Defaults to all') do |s|
         options['sheets'] = s 
       end
@@ -91,11 +87,19 @@ class DefineOptions
       end
 
       opts.on('-p', '--print', 'Output cards in sheet form') do |p|
-        options['print'] = true
+        options['print'] = p
+      end
+
+      opts.on('--pdf', 'Compile cards and pad them to a uniform pdf') do |p|
+        options['pdf'] = p
       end
 
       opts.on('-v', '--verbose', 'Verbose') do |v|
         options['verbose'] = true
+      end
+
+      opts.on('-c', '--clean', 'Clean directory before exporting') do |c|
+        options['clean'] = true
       end
 
       opts.on('-h', '--help', 'Show this message') do
