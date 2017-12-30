@@ -77,6 +77,7 @@ class CardListRenderer
       GC.start
     end
 
+    FileUtils.rm(Dir[@outdir + outdir + '/*.pdf'])
     pdf.save(@outdir + outdir + '/output.pdf')
   end
 
