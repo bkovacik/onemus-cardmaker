@@ -1,5 +1,6 @@
 require 'google_drive'
 require 'fileutils'
+require 'yaml'
 require_relative 'read_worksheet'
 require_relative 'render_card'
 require_relative 'render_cardlist'
@@ -18,12 +19,26 @@ unless (file = session.file_by_title(docname))
 end
 
 cards = {}
+defaultFile = nil
 worksheets = file.worksheets.dup
+
 if (options['sheets'])
   worksheets.select! { |sheet| options['sheets'].include?(sheet.title) }
 end
+
+if (options['gen-default'])
+  defaultFile = {}
+  defaultFile['cards'] = []
+end
+
 worksheets.each do |ws|
-  cards = cards.merge(symbol_replace(read_worksheet(ws), options))
+  cards = cards.merge(symbol_replace(read_worksheet(ws, defaultFile), options))
+end
+
+if (options['gen-default'])
+  File.open('config/default.yaml', 'w+') do |file|
+    file.write(defaultFile.to_yaml)
+  end
 end
 
 r = CardRenderer.new(options)

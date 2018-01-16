@@ -1,7 +1,8 @@
 # Takes worksheet and parses it
 # Returns a hash of cards SheetName => CardName => Card
+# Modifies defaultFile
 
-def read_worksheet(ws)
+def read_worksheet(ws, defaultFile)
   cards = {}
   keys = []
   (1..ws.num_rows).each do |row|
@@ -25,6 +26,13 @@ def read_worksheet(ws)
     unless (card.empty?)
       cards[ws.title][card['name']] = card
     end
+
+    if (defaultFile and card['count'])
+      defaultFile['cards'] << card.select do |field|
+        ['name', 'count'].include?(field)
+      end
+    end
+
   end
 
   return cards 

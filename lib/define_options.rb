@@ -102,6 +102,10 @@ class DefineOptions
         options['clean'] = true
       end
 
+      opts.on('-g', '--generate-default', "Generate default cardlist from document's counts") do |g|
+        options['gen-default'] = true
+      end
+
       opts.on('-h', '--help', 'Show this message') do
         puts opts
         exit
