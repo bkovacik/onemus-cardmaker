@@ -92,15 +92,6 @@ layout:
       color: text
       z-index: 3
 
-#    mercenary:
-#      type: static
-#      class: Mercenary
-#      x: 0.3
-#      y: ability.y 
-#      sizex: 1.85
-#      color: text
-#      text: mercenary
-
     attack:
       type: text 
       x: 2.0

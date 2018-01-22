@@ -5,8 +5,7 @@ include Magick
 DEFAULT_TEXT_SIZE = 0.12
 FONT_DIR = 'C:/Windows/Fonts/'
 
-SizeStruct = Struct.new(:sizex, :sizey) do
-end
+SizeStruct = Struct.new(:x, :y, :sizex, :sizey) { |s| }
 
 class CardRenderer
   def initialize(args)
@@ -81,7 +80,6 @@ class CardRenderer
         field = @fields[name]
 
         # defaults
-        unless (aspect = card['aspect']) then card['aspect'] = 'c' end
         unless field['rotate'] then field['rotate'] = 0 end
 
         case field['type']
@@ -175,7 +173,6 @@ class CardRenderer
         temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
       end
 
-
       position_image!(image, temp, drawHash, name, field, card)
     end
 
@@ -184,7 +181,8 @@ class CardRenderer
     def draw_rect!(name, field, image, card, drawHash)
       d = create_new_drawing(field, card)
 
-      pos = relative_to_value(drawHash, field, card)
+      pos = get_pos(field, drawHash)
+
       rotate_drawing!(field, d, pos)
 
       case field['type']
@@ -207,7 +205,12 @@ class CardRenderer
       end
 
       adjust_size!({'x' => field['sizex'], 'y' => field['sizey']}, field['rotate'])
-      drawHash[name] = SizeStruct.new(field['sizex']*@dpi, field['sizey']*@dpi)
+      drawHash[name] = SizeStruct.new(
+        resolve_field(field['x'], drawHash),
+        resolve_field(field['y'], drawHash),
+        resolve_field(field['sizex'], drawHash),
+        resolve_field(field['sizey'], drawHash)
+      )
       d.draw(image)
     end
 
@@ -222,7 +225,7 @@ class CardRenderer
       dims = get_poly_dims(side, n)
       r = m[:r]
 
-      pos = relative_to_value(drawHash, field, card)
+      pos = get_pos(field, drawHash) 
       rotate_drawing!(field, d, pos)
 
       angle_diff = 0
@@ -270,7 +273,12 @@ class CardRenderer
       path << ' Z'
 
       d.path(path)
-      drawHash[name] = SizeStruct.new(dims[:width], dims[:height])
+      drawHash[name] = SizeStruct.new(
+        dims[:offsetx],
+        dims[:offsety],
+        dims[:width],
+        dims[:height]
+      )
       d.draw(image) 
     end
 
@@ -398,29 +406,6 @@ class CardRenderer
         image.background_color = 'transparent'
         image.rotate!(field['rotate'])
       end
-    end
-
-    # Traverses relative fields and calculates the correct position
-    # Returns the value calculated
-    def relative_to_value(drawHash, field, card, padding=0)
-      pos = {}
-      {'x' => 'width', 'y' => 'height'}.each do |a, b|
-        attribute = field[a]
-        pos[a] = 0
-
-        while (!attribute.is_a?(Numeric))
-          o, f = attribute.split('.')
-          attribute = @fields[o][f]
-
-          sizey = drawHash[o][:sizey]
-          pos[a] += sizey if sizey
-          pos[a] += padding
-        end
-
-        pos[a] += (attribute*@dpi).floor
-      end
-
-      return pos
     end
 
     # Adjusts size to compensate for the resize from rotate_image
@@ -670,16 +655,18 @@ class CardRenderer
     # Positions to_position on other image and takes care of rotation etc.
     # Mutates image
     def position_image!(image, to_position, drawHash, name, field, card)
-      if (field['lineheight'])
-        pos = relative_to_value(drawHash, field, card, field['lineheight'])
-      else
-        pos = relative_to_value(drawHash, field, card)
-      end
+      pos = get_pos(field, drawHash)
 
       rotate_image!(field, to_position)
 
+      lineheight = field.has_key?('lineheight') ? field['lineheight'] : 0
       bbox_a = [to_position.columns, to_position.rows]
-      drawHash[name] = SizeStruct.new(*bbox_a)
+      drawHash[name] = SizeStruct.new(
+        resolve_field(field['x'], drawHash) + lineheight,
+        resolve_field(field['y'], drawHash) + lineheight,
+        to_position.columns.to_f/@dpi,
+        to_position.rows.to_f/@dpi,
+      )
 
       r = Math.sin(45*Math::PI/180)*bbox_a.min
       rad = field['rotate'] ? Math::PI*(field['rotate']+45)/180 : 0
@@ -691,6 +678,48 @@ class CardRenderer
         pos['y'] - min_axis/2 + r*Math.sin(rad),
         OverCompositeOp
       )
+    end
+
+    # Resolves a field using the drawHash if necessary
+    # Returns the resolved value
+    def resolve_field(field, drawHash)
+      if (field.is_a?(Numeric))
+        return field
+      else
+        operatorMatch = /([*+\/\-])/
+        resolvedTokens = field.split(operatorMatch).map do |token|
+          if (token =~ operatorMatch)
+            next token
+          end
+
+          matches = /(\w+)\.(\w+)/.match(token).captures
+
+          if (!matches.length)
+            raise "Malformed token #{token}"
+          elsif (drawHash.has_key?(matches[0]))
+            drawHash[matches[0]][matches[1].to_sym]
+          else
+            matches[0]
+          end
+        end
+
+        additionTokens = []
+        tempTokens = []
+        resolvedTokens.each do |token|
+          if (token =~ /[+\-]/)
+            additionTokens << do_operation(tempTokens)
+            tempTokens = []
+
+            additionTokens << token
+          else
+            tempTokens << token
+          end
+        end
+
+        additionTokens += tempTokens
+
+        return do_operation(additionTokens)
+      end
     end
 
     # Creates a new drawing, taking care of boilerplate
@@ -722,5 +751,33 @@ class CardRenderer
         when 'softlight'
           return Magick::SoftLightCompositeOp
       end
+    end
+
+    # Takes array in the form [operand, operator, operand,...]
+    # Does NOT follow order of operations
+    # Returns result
+    def do_operation(opArray)
+      if (!opArray.length)
+        return 0
+      end
+
+      result = opArray.shift
+
+      opArray.each_slice(2) do |a, b|
+        result = result.send(a, b)
+      end
+
+      return result
+    end
+
+    # Returns only x, y values from field, conveted from
+    # fieldname
+    def get_pos(field, drawHash)
+      pos = {}
+      ['x', 'y'].each do |a|
+        pos[a] = resolve_field(field[a], drawHash)*@dpi
+      end
+
+      return pos
     end
 end

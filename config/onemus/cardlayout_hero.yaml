@@ -98,7 +98,7 @@ layout:
     ability_1:
       type: text 
       x: 2.3 
-      y: ability_name_1.y
+      y: ability_name_1.y+ability_name_1.sizey
       sizex: 2.3
       sizey: 1.4
       color: text
@@ -106,7 +106,7 @@ layout:
     ability_name_2:
       type: text
       x: 2.3
-      y: ability_1.y
+      y: ability_1.y+ability_1.sizey
       sizex: 1.5
       sizey: 0.2
       color: text
@@ -115,7 +115,7 @@ layout:
     ability_tier_2:
       type: text
       x: 3.8
-      y: ability_1.y
+      y: ability_1.y+ability_1.sizey
       sizex: 0.3
       sizey: 0.2
       color: text
@@ -124,7 +124,7 @@ layout:
     ability_2:
       type: text 
       x: 2.3 
-      y: ability_name_2.y
+      y: ability_name_2.y+ability_name_2.sizey
       sizex: 2.3
       sizey: 1.4
       color: text
@@ -132,7 +132,7 @@ layout:
     ability_name_3:
       type: text
       x: 2.3
-      y: ability_2.y
+      y: ability_2.y+ability_2.sizey
       sizex: 1.5
       sizey: 0.2
       color: text
@@ -141,7 +141,7 @@ layout:
     ability_tier_3:
       type: text
       x: 3.8
-      y: ability_2.y
+      y: ability_2.y+ability_2.sizey
       sizex: 0.2
       sizey: 0.2
       color: text
@@ -150,7 +150,7 @@ layout:
     ability_3:
       type: text 
       x: 2.3
-      y: ability_name_3.y
+      y: ability_name_3.y+ability_name_3.sizey
       sizex: 2.3
       sizey: 1.4
       color: text
