@@ -113,22 +113,9 @@ class CardRenderer
           
       temp = Image.read(imagepath).first
 
-      size = {
-        'x' => temp.columns,
-        'y' => temp.rows
-      }
-
-      # Resize if size values are present
-      ['x', 'y'].each do |a|
-        if (field['size' + a]) 
-          size[a] = field['size' + a]*@dpi
-        end
-      end
+      temp = tile_crop_resize(temp, field)
 
       if (field['crop'])
-        temp.resize_to_fill!(size['x'], size['y'], Magick::WestGravity)
-      else
-        temp.resize!(size['x'], size['y'])
       end
 
       if (field['color'])
@@ -145,7 +132,7 @@ class CardRenderer
       end
 
       if (field['poly-mask'])
-        mask = Image.new(size['x'], size['y']) {
+        mask = Image.new(temp.columns, temp.rows) {
           self.background_color = 'white'
         }
 
@@ -770,7 +757,7 @@ class CardRenderer
       return result
     end
 
-    # Returns only x, y values from field, conveted from
+    # Returns only x, y values from field, converted from
     # fieldname
     def get_pos(field, drawHash)
       pos = {}
@@ -779,5 +766,57 @@ class CardRenderer
       end
 
       return pos
+    end
+
+    # Returns image tiled up to fieldsize
+    def tile_image(image, field)
+      tilex = field['tilex']*@dpi
+      tiley = field['tiley']*@dpi
+
+      tiledImage = ImageList.new
+
+      temp = image.scale(tilex, tiley)
+
+      timesX = (field['sizex'].to_f/field['tilex']).ceil
+      timesY = (field['sizey'].to_f/field['tiley']).ceil
+
+      (1..timesX).each do |x|
+        (1..timesY).each do |y|
+          tiledImage << temp
+        end
+      end
+
+      montage = tiledImage.montage() {
+        self.geometry = "#{tilex}x#{tiley}+0+0"
+        self.background_color = 'transparent'
+      }
+      tiledImage.clear()
+
+      return montage
+    end
+
+    # Handles sizing options
+    # Return image that has been tiled, cropped, or resized as needed
+    def tile_crop_resize(image, field)
+      size = {
+        'x' => image.columns,
+        'y' => image.rows
+      }
+
+      ['x', 'y'].each do |a|
+        if (field['size' + a])
+          size[a] = field['size' + a]*@dpi
+        end
+      end
+
+      if (field['tile'] or field['crop'])
+        image = tile_image(image, field) if field['tile']
+
+        image.resize_to_fill!(size['x'], size['y'], Magick::WestGravity)
+      else
+        image.resize!(size['x'], size['y'])
+      end
+
+      return image
     end
 end
