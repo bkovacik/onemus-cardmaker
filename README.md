@@ -46,13 +46,14 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 `tiley` - Height of each tile if `tile` is `true`
 `type` - Type of the component
   - *aspect\_icon* - Like an `icon`, but changes the icon based on the aspect of the card
-  - **\*gon** - Paints a \*-sided regular polygon
+  - _\*gon_ - Paints a \*-sided regular polygon
   - *icon* - Paints a static image
   - *image* - Paints a card-dependent image
   - *rect* - Paints a rectangle
   - *rounded* - Paints a rectangle with rounded border
   - *static* - Paints static text. This text should be defined in a different yaml whose root is `texts`
   - *text* - Paints card-dependent text
+
 `x` - X position of the component
 `y` - Y position of the component
 `z-index` - Stacking order of the field
