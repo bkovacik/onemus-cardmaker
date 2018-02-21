@@ -11,8 +11,7 @@ layout:
       y: 0
       sizex: 5.0
       sizey: 3.5
-      cornerx: 0.15 
-      cornery: 0.15
+      round: 0.15 
       color: border 
 
     background:

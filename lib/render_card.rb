@@ -179,8 +179,8 @@ class CardRenderer
             0,
             (field['sizex']*@dpi).floor - 1,
             (field['sizey']*@dpi).floor - 1,
-            (field['cornerx']*@dpi).floor,
-            (field['cornery']*@dpi).floor
+            (field['round']*@dpi).floor,
+            (field['round']*@dpi).floor
           )
         when 'rect'
           d.rectangle(
