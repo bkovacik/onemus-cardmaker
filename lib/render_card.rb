@@ -646,11 +646,10 @@ class CardRenderer
 
       rotate_image!(field, to_position)
 
-      lineheight = field.has_key?('lineheight') ? field['lineheight'] : 0
       bbox_a = [to_position.columns, to_position.rows]
       drawHash[name] = SizeStruct.new(
-        resolve_field(field['x'], drawHash) + lineheight,
-        resolve_field(field['y'], drawHash) + lineheight,
+        resolve_field(field['x'], drawHash),
+        resolve_field(field['y'], drawHash),
         to_position.columns.to_f/@dpi,
         to_position.rows.to_f/@dpi,
       )
