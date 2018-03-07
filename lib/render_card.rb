@@ -3,6 +3,8 @@ require 'yaml'
 
 require_relative 'components/text_component'
 require_relative 'components/static_component'
+require_relative 'components/rectangle_component'
+require_relative 'components/rounded_component'
 
 include Magick
 
@@ -112,8 +114,20 @@ class CardRenderer
             )
             position_image!(image, text.draw(@dpi), drawHash, name, field, card)
             text = nil
-          when 'rounded', 'rect'
-            draw_rect!(name, field, image, card, drawHash)
+          when 'rect'
+            rect = RectangleComponent.new(
+              name,
+              field,
+              card
+            )
+            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
+          when 'rounded'
+            rect = RoundedComponent.new(
+              name,
+              field,
+              card
+            )
+            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
           when /(\d+)gon/
             draw_poly!(name, field, image, card, drawHash, $1)
           when 'icon', 'image', 'aspect_icon'
@@ -188,44 +202,6 @@ class CardRenderer
       end
 
       position_image!(image, temp, drawHash, name, field, card)
-    end
-
-    # Draws rectangle on image
-    # Mutates image
-    def draw_rect!(name, field, image, card, drawHash)
-      d = create_new_drawing(field, card)
-
-      pos = get_pos(field, drawHash)
-
-      rotate_drawing!(field, d, pos)
-
-      case field['type']
-        when 'rounded'
-          d.roundrectangle(
-            0,
-            0,
-            (field['sizex']*@dpi).floor - 1,
-            (field['sizey']*@dpi).floor - 1,
-            (field['round']*@dpi).floor,
-            (field['round']*@dpi).floor
-          )
-        when 'rect'
-          d.rectangle(
-            0,
-            0,
-            (field['sizex']*@dpi).floor,
-            (field['sizey']*@dpi).floor,
-          )
-      end
-
-      adjust_size!({'x' => field['sizex'], 'y' => field['sizey']}, field['rotate'])
-      drawHash[name] = SizeStruct.new(
-        resolve_field(field['x'], drawHash),
-        resolve_field(field['y'], drawHash),
-        resolve_field(field['sizex'], drawHash),
-        resolve_field(field['sizey'], drawHash)
-      )
-      d.draw(image)
     end
 
     # Draws n-gon on image

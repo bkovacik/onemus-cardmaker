@@ -8,7 +8,7 @@ class BaseComponent
   end
 
   def draw(dpi)
-    return Image.new(2, 2) {
+    return Image.new(1, 1) {
       self.background_color = 'transparent'
     }
   end
