@@ -5,6 +5,7 @@ require_relative 'components/text_component'
 require_relative 'components/static_component'
 require_relative 'components/rectangle_component'
 require_relative 'components/rounded_component'
+require_relative 'components/poly_component'
 
 include Magick
 
@@ -129,7 +130,14 @@ class CardRenderer
             )
             position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
           when /(\d+)gon/
-            draw_poly!(name, field, image, card, drawHash, $1)
+            rect = PolyComponent.new(
+              name, 
+              field,
+              card,
+              $1
+            )
+            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
+            #draw_poly!(name, field, image, card, drawHash, $1)
           when 'icon', 'image', 'aspect_icon'
             draw_image!(name, field, image, card, drawHash)
           else
@@ -177,6 +185,7 @@ class CardRenderer
           self.background_color = 'white'
         }
 
+=begin
         draw_poly!(
           '',
           {
@@ -189,6 +198,7 @@ class CardRenderer
           {},
           field['poly-mask']
         )
+=end
 
         mask.alpha = Magick::DeactivateAlphaChannel
         mask = mask.negate
@@ -202,94 +212,6 @@ class CardRenderer
       end
 
       position_image!(image, temp, drawHash, name, field, card)
-    end
-
-    # Draws n-gon on image
-    # Mutates image
-    def draw_poly!(name, field, image, card, drawHash, n)
-      d = create_new_drawing(field, card)
-
-      n = n.to_i
-      side = field['side']*@dpi
-      m = get_poly_meas(side, n)
-      dims = get_poly_dims(side, n)
-      r = m[:r]
-
-      pos = get_pos(field, drawHash) 
-      rotate_drawing!(field, d, pos)
-
-      angle_diff = 0
-      if (field['round'])
-        new_r = Math.sqrt(m[:apothem]**2 + (side/2-field['round']*@dpi)**2)
-        angle_diff = Math.sin(m[:interior_angle]/2)*field['round']*@dpi/new_r
-        iterations = [-1, 0, 1]
-        labels = ['L', 'Q', '']
-        radii = [new_r, r, new_r]
-      else
-        iterations = [0]
-        labels = ['L']
-        radii = [r]
-      end
-
-      if (n.odd?)
-        rotate_offset = Math::PI/2-m[:center_angle]
-      else
-        if ((n/2).odd?)
-          rotate_offset = 0
-        else
-          rotate_offset = m[:center_angle]/2
-        end
-      end
-
-      coords = []
-      n.times do |i|
-        iterations.each_with_index do |a, j|
-          str = labels[j]
-          str += (radii[j] * Math.cos(m[:center_angle]*i - rotate_offset + angle_diff*a)\
-            + dims[:offsetx]).to_i.to_s
-
-          str += ','
-
-          str += (radii[j] * Math.sin(m[:center_angle]*i - rotate_offset + angle_diff*a)\
-            + dims[:offsety]).to_i.to_s
-
-          coords << str 
-        end
-      end
-
-      path = coords.join(' ')
-      path[0] = ''
-      path.prepend('M')
-      path << ' Z'
-
-      d.path(path)
-      drawHash[name] = SizeStruct.new(
-        dims[:offsetx],
-        dims[:offsety],
-        dims[:width],
-        dims[:height]
-      )
-      d.draw(image) 
-    end
-
-    # Rotates drawing and translates coordinates back to "normal"
-    # Mutates d
-    def rotate_drawing!(field, d, pos)
-      if (field['rotate'])
-        d.rotate(field['rotate'])
-        d.translate(
-          *rotate_coords(
-            pos['x'],
-            pos['y'],
-            -field['rotate']
-          )
-        )
-      else
-        d.translate(
-          pos['x'],
-          pos['y'],
-        )
-      end
     end
 
     # Rotates image
@@ -382,53 +304,6 @@ class CardRenderer
       when 'center'
         return CenterAlign
       end
-    end
-
-    # Takes in sidelength and number of sides
-    # Returns {width, height, offsetx, offsety}
-    def get_poly_dims(side, n)
-      m = get_poly_meas(side, n)
-
-      if (n.odd?)
-        h = m[:apothem] + m[:r]
-        w = Math.sin(m[:center_angle]*2)*m[:r]/Math.sin((Math::PI-m[:center_angle]*2)/2)
-        offsety = m[:r]
-      else
-        if ((n/2).odd?)
-          h = m[:apothem]*2
-          w = m[:r]*2
-        else
-          h = m[:apothem]*2
-          w = h
-        end
-
-        offsety = h/2
-      end
-
-      return {
-        width: w,
-        height: h,
-        offsetx: w/2,
-        offsety: offsety
-      }
-    end
-
-    # Takes in sidelength and number of sides
-    # Returns {interior_angle, center_angle, r, apothem}
-    def get_poly_meas(side, n)
-      interior_angle = (n-2)*Math::PI/n
-      center_angle = 2*Math::PI/n
-
-      r = side/Math.sin(center_angle)*Math.sin(interior_angle/2)
-      apothem = r*Math.sin(interior_angle/2)
-
-      return {
-        interior_angle: interior_angle,
-        center_angle: center_angle,
-
-        r: r,
-        apothem: apothem
-      }
     end
 
     # Positions to_position on other image and takes care of rotation etc.
