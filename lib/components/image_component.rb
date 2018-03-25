@@ -2,7 +2,7 @@ require_relative 'base_component'
 
 class ImageComponent < BaseComponent
   def initialize(name, field, card, globals, aspects, images)
-    super(name, field, card)
+    super(name, field, card, globals, aspects)
 
     @globals = globals
     @aspects = aspects
@@ -100,18 +100,5 @@ class ImageComponent < BaseComponent
         when 'softlight'
           return Magick::SoftLightCompositeOp
       end
-    end
-
-    def create_new_drawing()
-      d = Draw.new
-
-      if (@field['color'])
-        color = @field['color']
-
-        d.fill = @globals[color] ?
-          @globals[color] : @aspects[@card['aspect']]['color'][color]
-      end
-
-      return d
     end
 end

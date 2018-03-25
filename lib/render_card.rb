@@ -118,20 +118,26 @@ class CardRenderer
             temp = RectangleComponent.new(
               name,
               field,
-              card
+              card,
+              @globals,
+              @aspects
             )
           when 'rounded'
             temp = RoundedComponent.new(
               name,
               field,
-              card
+              card,
+              @globals,
+              @aspects
             )
           when /(\d+)gon/
             temp = PolyComponent.new(
               name, 
               field,
               card,
-              $1
+              $1,
+              @globals,
+              @aspects
             )
           when 'image'
             temp = ImageComponent.new(
@@ -273,7 +279,7 @@ class CardRenderer
     def get_pos(field)
       pos = {}
       ['x', 'y'].each do |a|
-        pos[a] = resolve_field(field[a], @drawHash)*@dpi
+        pos[a] = resolve_field(field[a])*@dpi
       end
 
       return pos

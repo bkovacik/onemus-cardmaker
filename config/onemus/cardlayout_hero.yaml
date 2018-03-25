@@ -12,7 +12,7 @@ layout:
       sizex: 5.0
       sizey: 3.5
       round: 0.15 
-      color: border 
+      color: border
 
     background:
       type: icon

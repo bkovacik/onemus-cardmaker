@@ -1,8 +1,8 @@
 require_relative 'base_component'
 
 class PolyComponent < BaseComponent
-  def initialize(name, field, card, n)
-    super(name, field, card)
+  def initialize(name, field, card, n, globals, aspects)
+    super(name, field, card, globals, aspects)
 
     @n = n.to_i
   end

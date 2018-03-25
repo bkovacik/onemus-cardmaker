@@ -12,7 +12,7 @@ class StaticComponent < TextComponent
     images,
     statictext
   )
-    super(name, field, card, globals)
+    super(name, field, card, globals, aspects)
 
     @text = statictext[field['text']]
   end

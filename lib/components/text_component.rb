@@ -2,7 +2,7 @@ require_relative 'base_component'
 
 class TextComponent < BaseComponent
   def initialize(name, field, card, font, globals, aspects, symbols, images)
-    super(name, field, card)
+    super(name, field, card, globals, aspects)
 
     @font = font
     @globals = globals
@@ -216,18 +216,5 @@ class TextComponent < BaseComponent
 
         tempimlist << im
       end
-    end
-
-    def create_new_drawing()
-      d = Draw.new
-
-      if (@field['color'])
-        color = @field['color']
-
-        d.fill = @globals[color] ?
-          @globals[color] : @aspects[@card['aspect']]['color'][color]
-      end
-
-      return d
     end
 end
