@@ -20,7 +20,7 @@ class ImageComponent < BaseComponent
       background = Image.new(temp.columns, temp.rows) {
         self.background_color = 'transparent'
       }
-      temp_dr = create_new_drawing(@card)
+      temp_dr = create_new_drawing()
 
       temp_dr.rectangle(0, 0, temp.columns, temp.rows)
       temp_dr.draw(background)
@@ -102,14 +102,14 @@ class ImageComponent < BaseComponent
       end
     end
 
-    def create_new_drawing(card)
+    def create_new_drawing()
       d = Draw.new
 
       if (@field['color'])
         color = @field['color']
 
         d.fill = @globals[color] ?
-          @globals[color] : @aspects[card['aspect']]['color'][color]
+          @globals[color] : @aspects[@card['aspect']]['color'][color]
       end
 
       return d

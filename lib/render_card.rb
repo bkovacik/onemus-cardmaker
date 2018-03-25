@@ -156,8 +156,9 @@ class CardRenderer
               name,
               field,
               card,
-              @images,
-              @globals
+              @globals,
+              @aspects,
+              @images
             )
           else
             raise "Invalid type field for #{name}!"

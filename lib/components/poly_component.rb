@@ -8,7 +8,7 @@ class PolyComponent < BaseComponent
   end
 
   def draw(dpi)
-    d = create_new_drawing(@card)
+    d = create_new_drawing()
 
     side = @field['side']*dpi
     m = get_poly_meas(side, @n)

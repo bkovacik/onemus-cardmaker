@@ -18,7 +18,7 @@ class TextComponent < BaseComponent
   def draw(dpi)
     return super(dpi) if @text.first.nil?
 
-    d = create_new_drawing(@card)
+    d = create_new_drawing()
     font = @fontDir +
       (@field['font'].nil? ? @font : @field['font']) +
       '.ttf'
@@ -218,14 +218,14 @@ class TextComponent < BaseComponent
       end
     end
 
-    def create_new_drawing(card)
+    def create_new_drawing()
       d = Draw.new
 
       if (@field['color'])
         color = @field['color']
 
         d.fill = @globals[color] ?
-          @globals[color] : @aspects[card['aspect']]['color'][color]
+          @globals[color] : @aspects[@card['aspect']]['color'][color]
       end
 
       return d
