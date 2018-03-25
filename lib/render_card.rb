@@ -48,6 +48,8 @@ class CardRenderer
     @aspects = @colors['aspects']
 
     @globals = @colors['globals']
+
+    @drawHash = {}
   end
 
   # Takes in a hash representing a card and outputs an image to the outputs directory
@@ -76,8 +78,6 @@ class CardRenderer
     # Draws a card to image
     # Mutates image
     def draw!(image, card) 
-      drawHash = {};
-
       sortedKeys = @fields.keys.sort_by do |key|
         @fields[key]['z-index'] = 0 unless @fields[key]['z-index']
         @fields[key]['z-index']
@@ -164,7 +164,7 @@ class CardRenderer
             raise "Invalid type field for #{name}!"
         end
 
-        position_image!(image, temp.draw(@dpi), drawHash, name, field, card)
+        position_image!(image, temp.draw(@dpi), name, field, card)
         temp = nil
       end
 
@@ -182,17 +182,17 @@ class CardRenderer
 
     # Positions to_position on other image and takes care of rotation etc.
     # Mutates image
-    def position_image!(image, to_position, drawHash, name, field, card)
-      pos = get_pos(field, drawHash)
+    def position_image!(image, to_position, name, field, card)
+      pos = get_pos(field)
 
       poly_mask!(to_position, field) if (field['poly-mask'])
 
       rotate_image!(field, to_position)
 
       bbox_a = [to_position.columns, to_position.rows]
-      drawHash[name] = SizeStruct.new(
-        resolve_field(field['x'], drawHash),
-        resolve_field(field['y'], drawHash),
+      @drawHash[name] = SizeStruct.new(
+        resolve_field(field['x']),
+        resolve_field(field['y']),
         to_position.columns.to_f/@dpi,
         to_position.rows.to_f/@dpi,
       )
@@ -209,9 +209,9 @@ class CardRenderer
       )
     end
 
-    # Resolves a field using the drawHash if necessary
+    # Resolves a field using the @drawHash if necessary
     # Returns the resolved value
-    def resolve_field(field, drawHash)
+    def resolve_field(field)
       if (field.is_a?(Numeric))
         return field
       else
@@ -225,8 +225,8 @@ class CardRenderer
 
           if (!matches.length)
             raise "Malformed token #{token}"
-          elsif (drawHash.has_key?(matches[0]))
-            drawHash[matches[0]][matches[1].to_sym]
+          elsif (@drawHash.has_key?(matches[0]))
+            @drawHash[matches[0]][matches[1].to_sym]
           else
             matches[0]
           end
@@ -270,10 +270,10 @@ class CardRenderer
 
     # Returns only x, y values from field, converted from
     # fieldname
-    def get_pos(field, drawHash)
+    def get_pos(field)
       pos = {}
       ['x', 'y'].each do |a|
-        pos[a] = resolve_field(field[a], drawHash)*@dpi
+        pos[a] = resolve_field(field[a], @drawHash)*@dpi
       end
 
       return pos
