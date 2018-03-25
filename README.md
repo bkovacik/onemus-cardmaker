@@ -15,6 +15,12 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 
 # Reference
 
+## Card hardcoded fields
+
+`aspect` - Determines the color for aspect-segmented cards.
+`name` - Name of the card. Required for indexing purposes.
+
+## Fields
 `align` - Text alignment (left, center, right)
 
 `color` - Name of color template. Defined in a different yaml whose roots are globals and aspects. Globals are the same regardless, aspects change based on aspect:

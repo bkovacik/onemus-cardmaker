@@ -1,3 +1,5 @@
+require 'rmagick'
+
 include Magick
 
 class BaseComponent
@@ -23,9 +25,10 @@ class BaseComponent
 
       if (@field['color'])
         color = @field['color']
-
-        d.fill = @globals[color] ?
+        fill = @globals[color] ?
           @globals[color] : @aspects[@card['aspect']]['color'][color]
+
+        d.fill(fill)
       end
 
       return d
