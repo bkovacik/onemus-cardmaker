@@ -7,9 +7,8 @@ class PolyComponent < BaseComponent
     @n = n.to_i
   end
 
-    #def draw_poly!(name, field, image, card, drawHash, n)
   def draw(dpi)
-    d = create_new_drawing(@field, @card)
+    d = create_new_drawing(@card)
 
     side = @field['side']*dpi
     m = get_poly_meas(side, @n)
@@ -61,7 +60,9 @@ class PolyComponent < BaseComponent
     path << ' Z'
 
     d.path(path)
-    image = Image.new(dims[:width], dims[:height])
+    image = Image.new(dims[:width], dims[:height]) {
+      self.background_color = 'transparent'
+    }
     d.draw(image) 
 
     return image

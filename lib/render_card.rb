@@ -6,9 +6,11 @@ require_relative 'components/static_component'
 require_relative 'components/rectangle_component'
 require_relative 'components/rounded_component'
 require_relative 'components/poly_component'
+require_relative 'components/image_component'
+require_relative 'components/icon_component'
+require_relative 'components/aspect_icon_component'
 
 include Magick
-
 
 SizeStruct = Struct.new(:x, :y, :sizex, :sizey) { |s| }
 
@@ -87,9 +89,10 @@ class CardRenderer
         # defaults
         unless field['rotate'] then field['rotate'] = 0 end
 
+        temp = nil
         case field['type']
           when 'text'
-            text = TextComponent.new(
+            temp = TextComponent.new(
               name,
               field,
               card,
@@ -99,10 +102,8 @@ class CardRenderer
               @symbols,
               @images
             )
-            position_image!(image, text.draw(@dpi), drawHash, name, field, card)
-            text = nil
           when 'static'
-            text = StaticComponent.new(
+            temp = StaticComponent.new(
               name,
               field,
               card,
@@ -113,105 +114,60 @@ class CardRenderer
               @images,
               @statictext
             )
-            position_image!(image, text.draw(@dpi), drawHash, name, field, card)
-            text = nil
           when 'rect'
-            rect = RectangleComponent.new(
+            temp = RectangleComponent.new(
               name,
               field,
               card
             )
-            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
           when 'rounded'
-            rect = RoundedComponent.new(
+            temp = RoundedComponent.new(
               name,
               field,
               card
             )
-            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
           when /(\d+)gon/
-            rect = PolyComponent.new(
+            temp = PolyComponent.new(
               name, 
               field,
               card,
               $1
             )
-            position_image!(image, rect.draw(@dpi), drawHash, name, field, card)
-            #draw_poly!(name, field, image, card, drawHash, $1)
-          when 'icon', 'image', 'aspect_icon'
-            draw_image!(name, field, image, card, drawHash)
+          when 'image'
+            temp = ImageComponent.new(
+              name,
+              field,
+              card,
+              @globals,
+              @aspects,
+              @images
+            )
+          when 'icon'
+            temp = IconComponent.new(
+              name,
+              field,
+              card,
+              @globals,
+              @aspects,
+              @images,
+            )
+          when 'aspect_icon'
+            temp = AspectIconComponent.new(
+              name,
+              field,
+              card,
+              @images,
+              @globals
+            )
           else
             raise "Invalid type field for #{name}!"
         end
+
+        position_image!(image, temp.draw(@dpi), drawHash, name, field, card)
+        temp = nil
       end
 
       @imageCache[card['name']] = image
-    end
-
-    # Draws image on image
-    # Mutates image
-    def draw_image!(name, field, image, card, drawHash)
-      case field['type']
-        when 'icon'
-          imagepath = @images + field['image']
-        when 'image'
-          imagepath = @images + card[name]
-        when 'aspect_icon'
-          imagepath = @images + field['images'][card['aspect']]
-      end
-          
-      temp = Image.read(imagepath).first
-
-      temp = tile_crop_resize(temp, field)
-
-      if (field['crop'])
-      end
-
-      if (field['color'])
-        background = Image.new(temp.columns, temp.rows) {
-          self.background_color = 'transparent'
-        }
-        temp_dr = create_new_drawing(field, card)
-
-        temp_dr.rectangle(0, 0, temp.columns, temp.rows)
-        temp_dr.draw(background)
-
-        background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
-        temp = background.composite!(temp, Magick::CenterGravity, string_to_copyop(field['combine']))
-      end
-
-      if (field['poly-mask'])
-        mask = Image.new(temp.columns, temp.rows) {
-          self.background_color = 'white'
-        }
-
-=begin
-        draw_poly!(
-          '',
-          {
-            'x' => 0,
-            'y' => 0,
-            'side' => field['side'] 
-          },
-          mask,
-          {},
-          {},
-          field['poly-mask']
-        )
-=end
-
-        mask.alpha = Magick::DeactivateAlphaChannel
-        mask = mask.negate
-
-        temp_mask = temp.channel(Magick::OpacityChannel)
-        temp_mask = temp_mask.negate
-
-        mask.composite!(temp_mask, Magick::CenterGravity, Magick::MultiplyCompositeOp)
-        
-        temp.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
-      end
-
-      position_image!(image, temp, drawHash, name, field, card)
     end
 
     # Rotates image
@@ -227,6 +183,8 @@ class CardRenderer
     # Mutates image
     def position_image!(image, to_position, drawHash, name, field, card)
       pos = get_pos(field, drawHash)
+
+      poly_mask!(to_position, field) if (field['poly-mask'])
 
       rotate_image!(field, to_position)
 
@@ -292,22 +250,6 @@ class CardRenderer
       end
     end
 
-    # Returns a Magick version of a composite operator
-    def string_to_copyop(str)
-      case str
-        when 'burn'
-          return Magick::ColorBurnCompositeOp
-        when 'dodge'
-          return Magick::ColorDodgeCompositeOp
-        when 'hardlight'
-          return Magick::HardLightCompositeOp
-        when 'overlay'
-          return Magick::OverlayCompositeOp
-        when 'softlight'
-          return Magick::SoftLightCompositeOp
-      end
-    end
-
     # Takes array in the form [operand, operator, operand,...]
     # Does NOT follow order of operations
     # Returns result
@@ -336,70 +278,33 @@ class CardRenderer
       return pos
     end
 
-    # Returns image tiled up to fieldsize
-    def tile_image(image, field)
-      tilex = field['tilex']*@dpi
-      tiley = field['tiley']*@dpi
-
-      tiledImage = ImageList.new
-
-      temp = image.scale(tilex, tiley)
-
-      timesX = (field['sizex'].to_f/field['tilex']).ceil
-      timesY = (field['sizey'].to_f/field['tiley']).ceil
-
-      (1..timesX).each do |x|
-        (1..timesY).each do |y|
-          tiledImage << temp
-        end
-      end
-
-      montage = tiledImage.montage() {
-        self.geometry = "#{tilex}x#{tiley}+0+0"
-        self.background_color = 'transparent'
-      }
-      tiledImage.clear()
-
-      return montage
-    end
-
-    # Handles sizing options
-    # Return image that has been tiled, cropped, or resized as needed
-    def tile_crop_resize(image, field)
-      size = {
-        'x' => image.columns,
-        'y' => image.rows
+    # Applies a poly-mask to an image
+    def poly_mask!(image, field)
+      mask = Image.new(image.columns, image.rows) {
+        self.background_color = 'white'
       }
 
-      ['x', 'y'].each do |a|
-        if (field['size' + a])
-          size[a] = field['size' + a]*@dpi
-        end
-      end
+      n = field['poly-mask']
+      poly = PolyComponent.new(
+        '',
+        {
+          'x' => 0,
+          'y' => 0,
+          'side' => field['side'] 
+        },
+        {},
+        n
+      )
 
-      if (field['tile'] or field['crop'])
-        image = tile_image(image, field) if field['tile']
+      mask.composite!(poly.draw(@dpi), Magick::WestGravity, Magick::OverCompositeOp)
+      mask.alpha = Magick::DeactivateAlphaChannel
+      mask = mask.negate
 
-        image.resize_to_fill!(size['x'], size['y'], Magick::WestGravity)
-      else
-        image.resize!(size['x'], size['y'])
-      end
+      temp_mask = image.channel(Magick::OpacityChannel)
+      temp_mask = temp_mask.negate
 
-      return image
-    end
+      mask.composite!(temp_mask, Magick::CenterGravity, Magick::MultiplyCompositeOp)
 
-    # Creates a new drawing, taking care of boilerplate
-    # Returns new drawing
-    def create_new_drawing(field, card)
-      d = Draw.new
-
-      if (field['color'])
-        color = field['color']
-
-        d.fill = @globals[color] ?
-          @globals[color] : @aspects[card['aspect']]['color'][color]
-      end
-
-      return d
+      return image.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
     end
 end

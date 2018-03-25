@@ -16,7 +16,7 @@ class BaseComponent
   protected
     # Creates a new drawing, taking care of boilerplate
     # Returns new drawing
-    def create_new_drawing(field, card)
+    def create_new_drawing(card)
       return Draw.new
     end
 end

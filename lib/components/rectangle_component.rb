@@ -2,7 +2,7 @@ require_relative 'base_component'
 
 class RectangleComponent < BaseComponent
   def draw(dpi)
-    d = create_new_drawing(@field, @card)
+    d = create_new_drawing(@card)
     image = Image.new(
       (@field['sizex']*dpi).floor,
       (@field['sizey']*dpi).floor
