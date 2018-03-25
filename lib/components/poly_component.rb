@@ -15,6 +15,7 @@ class PolyComponent < BaseComponent
     dims = get_poly_dims(side, @n)
     r = m[:r]
 
+    # Create base nodes
     angle_diff = 0
     if (@field['round'])
       new_r = Math.sqrt(m[:apothem]**2 + (side/2-@field['round']*dpi)**2)
@@ -28,6 +29,7 @@ class PolyComponent < BaseComponent
       radii = [r]
     end
 
+    # Rotate to a reasonable orientation
     if (@n.odd?)
       rotate_offset = Math::PI/2-m[:center_angle]
     else
@@ -38,6 +40,7 @@ class PolyComponent < BaseComponent
       end
     end
 
+    # Compile the pathstring
     coords = []
     @n.times do |i|
       iterations.each_with_index do |a, j|

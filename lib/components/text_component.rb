@@ -40,6 +40,7 @@ class TextComponent < BaseComponent
     height = d.get_type_metrics('.').height
     textlength = 0
 
+    # Normalize textstring and get resulting width
     text.each_with_index do |item, i|
       if (item.class == Image)
         sc = height/item.rows
@@ -60,6 +61,7 @@ class TextComponent < BaseComponent
 
     lines = break_text_with_image(@field['sizex']*dpi, text, d)
 
+    # Append and align text
     lines.each_with_index do |line, i|
       tempimlist = ImageList.new
 
@@ -81,10 +83,7 @@ class TextComponent < BaseComponent
       tempimlist = ImageList.new 
 
       unless (pad.zero?)
-        padimg = Image.new(
-          pad,
-          tempimg.rows
-        ) {
+        padimg = Image.new(pad, tempimg.rows) {
           self.background_color = 'transparent'
         }
         tempimlist << padimg
