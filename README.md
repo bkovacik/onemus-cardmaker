@@ -18,6 +18,7 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 ## Card hardcoded fields
 
 `aspect` - Determines the color for aspect-segmented cards.
+
 `name` - Name of the card. Required for indexing purposes.
 
 ## Fields

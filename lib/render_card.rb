@@ -173,8 +173,6 @@ class CardRenderer
         position_image!(image, temp.draw(@dpi), name, field, card)
         temp = nil
       end
-
-      @imageCache[card['name']] = image
     end
 
     # Rotates image
