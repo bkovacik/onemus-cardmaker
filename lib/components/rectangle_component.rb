@@ -19,7 +19,7 @@ class RectangleComponent < BaseComponent
     # Mutates drawing
     # Draws a rectangle on the drawing
     def draw_rectangle(dpi, drawing)
-      drawing.roundrectangle(
+      drawing.rectangle(
         0,
         0,
         (@field['sizex']*dpi).floor,

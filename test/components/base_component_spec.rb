@@ -12,7 +12,7 @@ describe 'create new drawing' do
       baseComponent = BaseComponent.new('', {}, {}, {}, {})
       d = baseComponent.send(:create_new_drawing)
 
-      expect(d.inspect).to eq('(no primitives defined)')
+      expect(d.inspect).to(eq('(no primitives defined)'))
     end
   end
 
@@ -22,7 +22,7 @@ describe 'create new drawing' do
         baseComponent = create_base_component(true, false)
         d = baseComponent.send(:create_new_drawing)
 
-        expect(d.inspect).to eq("fill \"#{ASPECTBASE}\"")
+        expect(d.inspect).to(eq("fill \"#{ASPECTBASE}\""))
       end
     end
 
@@ -31,7 +31,7 @@ describe 'create new drawing' do
         baseComponent = create_base_component(true, true)
         d = baseComponent.send(:create_new_drawing)
 
-        expect(d.inspect).to eq("fill \"#{GLOBALBASE}\"")
+        expect(d.inspect).to(eq("fill \"#{GLOBALBASE}\""))
       end
     end
   end

@@ -28,6 +28,8 @@ class ImageComponent < BaseComponent
       background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
 
       background.composite!(temp, Magick::CenterGravity, string_to_copyop(@field['combine']))
+    else
+      background = temp
     end
 
     return background
@@ -51,9 +53,9 @@ class ImageComponent < BaseComponent
       if (@field['tile'] or @field['crop'])
         image = tile_image(image, dpi) if @field['tile']
 
-        image.resize_to_fill!(size['x'], size['y'], Magick::WestGravity)
+        image.crop!(Magick::CenterGravity, size['x'], size['y'])
       else
-        image.resize!(size['x'], size['y'])
+        image.resize!(size['x'], size['y'], Magick::CubicFilter, 0.7)
       end
 
       return image
@@ -80,6 +82,7 @@ class ImageComponent < BaseComponent
       montage = tiledImage.montage() {
         self.geometry = "#{tilex}x#{tiley}+0+0"
         self.background_color = 'transparent'
+        self.tile = "#{timesX}x#{timesY}"
       }
       tiledImage.clear()
 
