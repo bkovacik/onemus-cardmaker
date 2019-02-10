@@ -59,7 +59,9 @@ class TextComponent < BaseComponent
     d.pointsize = fontsize*scale
     d.gravity = Magick::SouthWestGravity
 
-    lines = break_text_with_image(@field['sizex']*dpi, text, d)
+    width = @field['sizex'] ? @field['sizex']*dpi : 0
+
+    lines = break_text_with_image(width, text, d)
 
     # Append and align text
     lines.each_with_index do |line, i|
@@ -153,18 +155,21 @@ class TextComponent < BaseComponent
         if (line.empty?)
           line << item
         else
-          if (itemlength + linelength > width)
+          if (width != 0 && itemlength + linelength > width)
             result << line
             line = [item]
             linelength = 0
           else
             t = line.pop
 
-            t += ' ' if (t.class != Image)
+            if (t.class != Image)
+              t += ' '
+            elsif (item.class != Image)
+              item = ' ' + item
+            end
             
             if (t.class == Image or item.class == Image)
               line << t << item
-
             else
               line << t + item
             end
@@ -192,6 +197,7 @@ class TextComponent < BaseComponent
     # Takes in a line and an image list to populate with token images from the line
     # Mutates tempimlist
     def populate_imglist!(line, tempimlist, d, scale)
+      spaceWidth = d.get_type_metrics('a a').width - d.get_type_metrics('aa').width
       line.each do |item|
         im = nil
 
@@ -199,10 +205,12 @@ class TextComponent < BaseComponent
           im = item.resize(scale)
           im.background_color = 'transparent'
         else
-          metrics = d.get_type_metrics(item)
+          trimItem = item.gsub(/^ */, '')
+          numSpaces = item.length - trimItem.length
+          metrics = d.get_type_metrics(trimItem)
 
           im = Image.new(
-            metrics.width,
+            metrics.width + spaceWidth * numSpaces,
             metrics.height
           ) {
             self.background_color = 'transparent'
