@@ -6,4 +6,4 @@ gem 'combine_pdf'
 gem 'rspec'
 
 # Force nokogiri over vulnerable dependency
-gem 'nokogiri', '>=1.8.1'
+gem 'nokogiri', '>=1.8.5'
