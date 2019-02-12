@@ -38,6 +38,7 @@ class TextComponent < BaseComponent
     d.pointsize = fontsize
 
     height = d.get_type_metrics('.').height
+
     textlength = 0
 
     # Normalize textstring and get resulting width

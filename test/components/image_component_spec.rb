@@ -3,8 +3,8 @@ require 'rmagick'
 
 require_relative '../../lib/components/image_component'
 
+#Override DPI, so set DPI to 1
 BASEIMAGESIZE = 32
-DPI = 72
 IMAGETILES = [
   {
     rows: 1,
@@ -66,7 +66,6 @@ describe 'resize' do
     it "returns an image with #{rows} rows and #{cols} columns" do
       image = create_resized_image(rows, cols).draw(1)
 
-image.write(File.expand_path('test/images/image.png'))
       generatedImagePixels = image.export_pixels_to_str
       testImagePixels = Image.read("./test/images/base_image_resize_#{rows}x#{cols}.png").first.export_pixels_to_str
 
@@ -120,4 +119,3 @@ def create_resized_image(rows, cols)
     File.expand_path('./test/images/base_image.png')
   )
 end
-
