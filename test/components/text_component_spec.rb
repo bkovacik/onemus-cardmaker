@@ -3,17 +3,6 @@ require 'rmagick'
 
 require_relative '../../lib/components/text_component'
 
-=begin
-TO TEST:
-symbols are replaced properly
-  - binary, either they do or they don't
-metrics calculate properly (broken into lines properly)
-  + test some wonky sizes of symbols/text
-  + test small line sizes
-alignment works
-  + test center/left/right, also with symbols
-=end
-
 DPI = 72
 
 TEXTBLOBS = [

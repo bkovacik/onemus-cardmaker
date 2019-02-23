@@ -10,6 +10,8 @@ class PolyComponent < BaseComponent
   def draw(dpi)
     d = create_new_drawing()
 
+    raise 'Polygon needs n of 3 or larger!' if [nil, 0, 1, 2].include?(@n)
+
     side = @field['side']*dpi
     m = get_poly_meas(side, @n)
     dims = get_poly_dims(side, @n)
@@ -79,7 +81,9 @@ class PolyComponent < BaseComponent
 
       if (n.odd?)
         h = m[:apothem] + m[:r]
-        w = Math.sin(m[:center_angle]*2)*m[:r]/Math.sin((Math::PI-m[:center_angle]*2)/2)
+        widestvertex = (n+1)/4
+        rotate_offset = Math::PI/2
+        w = 2*m[:r]*Math.cos(m[:center_angle]*widestvertex-rotate_offset)
         offsety = m[:r]
       else
         if ((n/2).odd?)
