@@ -13,31 +13,36 @@ describe 'draw polygon' do
     context "#{n} sides" do
       it 'raises an exception' do
         expect {
-          create_polygon(n).draw(DPI)
+          create_polygon(n, 0).draw(DPI)
         }.to(raise_error(RuntimeError))
       end
     end
   end
 
-  GOODSIDES.each do |n|
-    context "#{n} sides" do
-      it "draws a polygon with #{n} sides" do
-        image = create_polygon(n).draw(DPI)
+  [true, false].each do |rounded|
+    roundString = rounded ? 'rounded' : 'sharp'
+    GOODSIDES.each do |n|
+      context "#{n} sides" do
+        it "draws a polygon with #{n} sides" do
+          image = create_polygon(n, rounded).draw(DPI)
 
-        generatedImagePixels = image.export_pixels_to_str
-        testImagePixels = Image.read("./test/images/#{n}gon.png").first.export_pixels_to_str
+          generatedImagePixels = image.export_pixels_to_str
+          testImagePixels = Image.read("./test/images/#{n}gon_#{roundString}.png").first.export_pixels_to_str
 
-        expect(generatedImagePixels).to(eq(testImagePixels))
+          expect(generatedImagePixels).to(eq(testImagePixels))
+        end
       end
     end
   end
 end
 
-def create_polygon(n)
+def create_polygon(n, rounded)
+  round = rounded ? 0.15 : 0.0
   return PolyComponent.new(
     '',
     {
-      'side' => 1,
+      'side'  => 1,
+      'round' => round
     },
     {},
     n,
