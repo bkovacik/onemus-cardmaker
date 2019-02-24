@@ -22,8 +22,8 @@ describe 'draw polygon' do
   [true, false].each do |rounded|
     roundString = rounded ? 'rounded' : 'sharp'
     GOODSIDES.each do |n|
-      context "#{n} sides" do
-        it "draws a polygon with #{n} sides" do
+      context "#{n} #{roundString} sides" do
+        it "draws a polygon with #{n} #{roundString} sides" do
           image = create_polygon(n, rounded).draw(DPI)
 
           generatedImagePixels = image.export_pixels_to_str
