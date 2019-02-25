@@ -13,6 +13,7 @@ class ImageComponent < BaseComponent
 
   def draw(dpi)
     temp = Image.read(@imagepath).first
+temp.write(File.expand_path("test/images/blep.png"))
 
     temp = tile_crop_resize(temp, dpi)
 
@@ -44,9 +45,12 @@ class ImageComponent < BaseComponent
         'y' => image.rows
       }
 
+      resize = false
+
       ['x', 'y'].each do |a|
         if (@field['size' + a])
           size[a] = @field['size' + a]*dpi
+          resize = true
         end
       end
 
@@ -54,7 +58,7 @@ class ImageComponent < BaseComponent
         image = tile_image(image, dpi) if @field['tile']
 
         image.crop!(Magick::CenterGravity, size['x'], size['y'])
-      else
+      elsif (resize)
         image.resize!(size['x'], size['y'], Magick::CubicFilter, 0.7)
       end
 
