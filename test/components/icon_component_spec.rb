@@ -12,7 +12,6 @@ describe 'create icon' do
 
       generatedImagePixels = image.export_pixels_to_str
       testImagePixels = Image.read("./test/images/base_image.png").first.export_pixels_to_str
-      #generatedImagePixels = Image.read("./test/images/blep.png").first.export_pixels_to_str
 
       expect(generatedImagePixels).to(eq(testImagePixels))
     end
