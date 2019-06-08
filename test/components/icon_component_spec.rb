@@ -3,7 +3,7 @@ require 'rmagick'
 
 require_relative '../../lib/components/icon_component'
 
-DPI = 72
+DPI ||= 72
 
 describe 'create icon' do
   context 'always' do

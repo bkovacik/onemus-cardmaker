@@ -3,7 +3,7 @@ require 'rmagick'
 
 require_relative '../../lib/components/text_component'
 
-DPI = 72
+DPI ||= 72
 
 TEXTBLOBS = [
   {

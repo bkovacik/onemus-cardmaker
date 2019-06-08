@@ -3,7 +3,7 @@ require 'rmagick'
 
 require_relative '../../lib/components/aspect_icon_component'
 
-DPI = 72
+DPI ||= 72
 
 ASPECTS = ['n', 'a', 'e']
 

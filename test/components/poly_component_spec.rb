@@ -3,7 +3,7 @@ require 'rmagick'
 
 require_relative '../../lib/components/poly_component'
 
-DPI = 72
+DPI ||= 72
 
 BADSIDES = [0, 1, 2]
 GOODSIDES = [3, 4, 6, 7, 8]
