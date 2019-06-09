@@ -37,7 +37,34 @@ FIELDS = [
       'rotate' => 60,
       'image' => 'base_image.png'
     }
+  }, {
+    'field1' => {
+      'type' => 'icon',
+      'x' => 1,
+      'y' => 2,
+      'rotate' => 225,
+      'dropshadow'  => {
+        'blur' => 0.2,
+        'x' => -0.3,
+        'y' => -0.3
+      },
+      'image' => 'base_image.png'
+    }
+  }, {
+    'field1' => {
+      'type' => 'icon',
+      'x' => 1,
+      'y' => 2,
+      'rotate' => 225,
+      'dropshadow'  => {
+        'blur' => 0.3,
+        'x' => 0.1,
+        'y' => -0.2
+      },
+      'image' => 'base_image.png'
+    }
   }
+
 ]
 
 describe 'image rotates' do

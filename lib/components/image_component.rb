@@ -13,7 +13,6 @@ class ImageComponent < BaseComponent
 
   def draw(dpi)
     temp = Image.read(@imagepath).first
-temp.write(File.expand_path("test/images/blep.png"))
 
     temp = tile_crop_resize(temp, dpi)
 

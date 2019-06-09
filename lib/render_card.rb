@@ -189,9 +189,11 @@ class CardRenderer
     def position_image!(image, to_position, name, field, card)
       pos = get_pos(field)
 
-      poly_mask!(to_position, field) if (field['poly-mask'])
+      poly_mask!(field, to_position) if (field['poly-mask'])
 
       rotate_image!(field, to_position)
+
+      to_position = drop_shadow(field, to_position) if (field['dropshadow'])
 
       bbox_a = [to_position.columns, to_position.rows]
       @drawHash[name] = SizeStruct.new(
@@ -283,8 +285,44 @@ class CardRenderer
       return pos
     end
 
+    # Adds a drop shadow to an image
+    def drop_shadow(field, image)
+      shadow = image.copy().colorize(1, 1, 1, 'black')
+      transposeX = field['dropshadow']['x'] ? field['dropshadow']['x'] : 0
+      transposeY = field['dropshadow']['y'] ? field['dropshadow']['y'] : 0
+      blur = field['dropshadow']['blur'] ? field['dropshadow']['blur'] : 0
+
+      canvas = Image.new(
+        image.columns + (transposeX.abs + blur*2)*@dpi,
+        image.rows + (transposeY.abs + blur*2)*@dpi,
+      ) {
+        self.background_color = 'transparent'
+      }
+
+      # Blur if transpose > blur, tranpose otherwise
+      imageTransposeX = [[blur - transposeX, transposeX].max, blur].min
+
+      shadowTransposeX = transposeX.abs - imageTransposeX + blur
+      imageTransposeX = blur - imageTransposeX
+
+      imageTransposeY = [[blur - transposeY, transposeY].max, blur].min
+
+      shadowTransposeY = transposeY.abs - imageTransposeY + blur
+      imageTransposeY = blur - imageTransposeY
+
+      imageTransposeX, shadowTransposeX = shadowTransposeX + blur, imageTransposeX + blur if (transposeX < 0)
+      imageTransposeY, shadowTransposeY = shadowTransposeY + blur, imageTransposeY + blur if (transposeY < 0)
+
+      canvas.composite!(shadow, shadowTransposeX*@dpi, shadowTransposeY*@dpi, Magick::OverCompositeOp)
+      canvas = canvas.gaussian_blur(blur*@dpi, blur/2*@dpi)
+
+      canvas.composite!(image, imageTransposeX*@dpi, imageTransposeY*@dpi, Magick::OverCompositeOp)
+
+      return canvas
+    end
+
     # Applies a poly-mask to an image
-    def poly_mask!(image, field)
+    def poly_mask!(field, image)
       mask = Image.new(image.columns, image.rows) {
         self.background_color = 'white'
       }

@@ -41,6 +41,11 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 
 `crop` - Whether to crop to size. Resizes otherwise
 
+`dropshadow` - Applies a drop shadow to the field
+  - *blur* - How much to blur the shadow
+  - *x* - Transpose X
+  - *y* - Transpose Y
+
 `font` - Font of the text
 
 `image` - Image for image/icon type fields
