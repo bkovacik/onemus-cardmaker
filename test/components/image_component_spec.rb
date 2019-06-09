@@ -17,7 +17,7 @@ IMAGETILES = [
   {
     rows: 2.5,
     cols: 0.5
-  }, 
+  },
   {
     rows: 2,
     cols: 2
@@ -59,7 +59,7 @@ describe 'crop' do
 end
 
 describe 'resize' do
-  rows = 2 
+  rows = 2
   cols = 3
 
   context "#{rows}x#{cols}" do

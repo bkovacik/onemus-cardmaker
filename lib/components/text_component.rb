@@ -25,7 +25,7 @@ class TextComponent < BaseComponent
     unless File.file?(font)
       raise "#{font} not found!"
     else
-      d.font = font 
+      d.font = font
     end
 
     il = ImageList.new
@@ -83,7 +83,7 @@ class TextComponent < BaseComponent
       pad = pad.to_i
 
       tempimlist.destroy!
-      tempimlist = ImageList.new 
+      tempimlist = ImageList.new
 
       unless (pad.zero?)
         padimg = Image.new(pad, tempimg.rows) {
@@ -106,7 +106,7 @@ class TextComponent < BaseComponent
 
   protected
     # Takes in array containing a string and the name of the field
-    # Returns array of text and symbols 
+    # Returns array of text and symbols
     def replace_with_symbols(text, name)
       @symbols.each do |symbol|
         if (symbol['image'] and symbol['fields'].include?(name))
@@ -126,8 +126,8 @@ class TextComponent < BaseComponent
           m = Image.ping(imagepath).first
           replace_image = Image.read(imagepath).first
 
-          text = temp.flatten.map { |x| 
-            if (x == symbol['symbol']) 
+          text = temp.flatten.map { |x|
+            if (x == symbol['symbol'])
               replace_image
             else
               x
@@ -168,7 +168,7 @@ class TextComponent < BaseComponent
             elsif (item.class != Image)
               item = ' ' + item
             end
-            
+
             if (t.class == Image or item.class == Image)
               line << t << item
             else

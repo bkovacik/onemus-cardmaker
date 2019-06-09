@@ -10,7 +10,7 @@ def read_worksheet(ws, defaultFile)
       cards[ws.title] = {}
     end
 
-    card = {}  
+    card = {}
 
     (1..ws.num_cols).each do |col|
       if ws[row, col].empty? then next end
@@ -22,7 +22,7 @@ def read_worksheet(ws, defaultFile)
         card[keys[col-1]] = ws[row, col]
       end
     end
-    
+
     unless (card.empty?)
       cards[ws.title][card['name']] = card
     end
@@ -32,8 +32,7 @@ def read_worksheet(ws, defaultFile)
         ['name', 'count'].include?(field)
       end
     end
-
   end
 
-  return cards 
+  return cards
 end

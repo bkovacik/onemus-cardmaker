@@ -25,7 +25,7 @@ class CardRenderer
 
     @dpi = args['dpi'] ? args['dpi'] : layout['dpi']
 
-    @fields = layout['fields'] 
+    @fields = layout['fields']
     @cardX = (layout['x'] * @dpi).floor
     @cardY = (layout['y'] * @dpi).floor
     @font = layout['font']
@@ -77,7 +77,7 @@ class CardRenderer
   private
     # Draws a card to image
     # Mutates image
-    def draw!(image, card) 
+    def draw!(image, card)
       sortedKeys = @fields.keys.sort_by do |key|
         @fields[key]['z-index'] = 0 unless @fields[key]['z-index']
         @fields[key]['z-index']
@@ -132,7 +132,7 @@ class CardRenderer
             )
           when /(\d+)gon/
             temp = PolyComponent.new(
-              name, 
+              name,
               field,
               card,
               $1,
@@ -333,7 +333,7 @@ class CardRenderer
         {
           'x' => 0,
           'y' => 0,
-          'side' => field['side'] 
+          'side' => field['side']
         },
         {},
         n

@@ -39,7 +39,7 @@ def create_static()
       'symbol'  => '`d',
       'replace' => '/base_image.png',
       'image'   => true,
-      'fields'  => [ 'text' ]     
+      'fields'  => [ 'text' ]
     }],
     imagepath,
     {

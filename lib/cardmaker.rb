@@ -15,7 +15,7 @@ confpath = File.expand_path('../config/config.json', File.dirname(__FILE__))
 session = GoogleDrive::Session.from_config(confpath)
 
 unless (file = session.file_by_title(docname))
-  raise "File #{docname} not found!" 
+  raise "File #{docname} not found!"
 end
 
 cards = {}

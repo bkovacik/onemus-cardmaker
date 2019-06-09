@@ -63,7 +63,7 @@ class DefineOptions
       end
 
       opts.on('--sheets=SHEETS', Array, 'Which sheets to export. Defaults to all') do |s|
-        options['sheets'] = s 
+        options['sheets'] = s
       end
 
       opts.on('--dpi=DPI', Integer, 'DPI of exported images') do |d|

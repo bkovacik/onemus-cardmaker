@@ -35,7 +35,7 @@ def create_rectangle(width, height, round)
       {}
     )
   end
-    
+
   return RectangleComponent.new(
     '',
     {

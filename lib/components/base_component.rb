@@ -28,7 +28,7 @@ class BaseComponent
       return d
     end
 
-    # Gets the correct fill color for the drawing 
+    # Gets the correct fill color for the drawing
     def get_color(color)
         return @globals[color] ?
           @globals[color] : @aspects[@card['aspect']]['color'][color]

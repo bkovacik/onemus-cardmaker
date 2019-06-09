@@ -55,7 +55,7 @@ class PolyComponent < BaseComponent
         str += (radii[j] * Math.sin(m[:center_angle]*i - rotate_offset + angle_diff*a)\
           + dims[:offsety]).to_i.to_s
 
-        coords << str 
+        coords << str
       end
     end
 
@@ -68,7 +68,7 @@ class PolyComponent < BaseComponent
     image = Image.new(dims[:width], dims[:height]) {
       self.background_color = 'transparent'
     }
-    d.draw(image) 
+    d.draw(image)
 
     return image
   end

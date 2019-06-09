@@ -45,7 +45,7 @@ def create_base_component(color, global)
   globals[COLOR] = GLOBALBASE if global
 
   return BaseComponent.new('', field, {
-    'aspect' => 'n' 
+    'aspect' => 'n'
   }, globals, {
     'n' => {
       'color' => {
