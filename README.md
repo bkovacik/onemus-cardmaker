@@ -52,6 +52,10 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 
 `images` - character to match: image. Used in aspect\_icon
 
+`outline` - Outline for text fields
+  - *color* - Color
+  - *stroke* - Stroke width (how large the outline is)
+
 `poly-mask` - Apply an \*gon mask to the field
 
 `rotate` - Degrees the field is rotated

@@ -68,7 +68,7 @@ class TextComponent < BaseComponent
     lines.each_with_index do |line, i|
       tempimlist = ImageList.new
 
-      populate_imglist!(line, tempimlist, d, scale)
+      populate_imglist!(line, tempimlist, d, scale, dpi)
 
       tempimg = tempimlist.append(false)
 
@@ -197,7 +197,7 @@ class TextComponent < BaseComponent
 
     # Takes in a line and an image list to populate with token images from the line
     # Mutates tempimlist
-    def populate_imglist!(line, tempimlist, d, scale)
+    def populate_imglist!(line, tempimlist, d, scale, dpi)
       spaceWidth = d.get_type_metrics('a a').width - d.get_type_metrics('aa').width
       line.each do |item|
         im = nil
@@ -210,19 +210,43 @@ class TextComponent < BaseComponent
           numSpaces = item.length - trimItem.length
           metrics = d.get_type_metrics(trimItem)
 
-          im = Image.new(
-            metrics.width + spaceWidth * numSpaces,
-            metrics.height
-          ) {
+          imageX = metrics.width + spaceWidth * numSpaces
+          imageY = metrics.height
+
+          if (@field['outline'])
+            stroke = @field['outline']['stroke']
+            imageX += stroke*2*dpi
+            imageY += stroke*2*dpi
+          end
+
+          im = Image.new(imageX, imageY) {
             self.background_color = 'transparent'
           }
 
           dr = d.clone
-          dr.text(0, 0, item)
-          dr.draw(im)
+          outline!(dr, im, dpi, item, 0, 0)
         end
 
         tempimlist << im
       end
+    end
+
+    # Writes possibly outlined text
+    # Mutates image
+    def outline!(d, im, dpi, text, x, y)
+      dr = d.clone
+
+      outline = @field['outline']
+      if (outline && outline['stroke'] > 0)
+        dr.stroke_width(outline['stroke'] * dpi) if outline['stroke']
+        dr.stroke(get_color(outline['color'])) if outline['color']
+        dr.text(x, y, text)
+
+        dr.draw(im)
+      end
+
+      d.text(x, y, text)
+
+      d.draw(im)
     end
 end
