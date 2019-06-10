@@ -81,6 +81,7 @@ def create_tiled_image(rows, cols)
       'sizex' => cols*BASEIMAGESIZE,
       'sizey' => rows*BASEIMAGESIZE,
       'tile'  => true,
+      'crop'  => true,
       'tilex' => BASEIMAGESIZE,
       'tiley' => BASEIMAGESIZE
     },
