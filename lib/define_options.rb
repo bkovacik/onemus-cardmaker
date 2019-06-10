@@ -102,6 +102,10 @@ class DefineOptions
         options['clean'] = true
       end
 
+      opts.on('-l', '--local', 'Use local filename') do |l|
+        options['local'] = true
+      end
+
       opts.on('-g', '--generate-default', "Generate default cardlist from document's counts") do |g|
         options['gen-default'] = true
       end

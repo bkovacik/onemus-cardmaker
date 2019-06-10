@@ -1,29 +1,44 @@
 require 'google_drive'
 require 'fileutils'
 require 'yaml'
+require 'roo'
+
 require_relative 'read_worksheet'
 require_relative 'render_card'
 require_relative 'render_cardlist'
 require_relative 'symbol_replace'
 require_relative 'define_options'
+require_relative 'facades/facade_factory'
 
 options = {}
 DefineOptions.new(options)
 
 docname = options['name']
-confpath = File.expand_path('../config/config.json', File.dirname(__FILE__))
-session = GoogleDrive::Session.from_config(confpath)
 
-unless (file = session.file_by_title(docname))
-  raise "File #{docname} not found!"
+if (options['local'])
+  workbook = Roo::Excelx.new(File.expand_path(docname, File.dirname(__FILE__)))
+
+  worksheets = workbook.sheets
+else 
+  confpath = File.expand_path('../config/config.json', File.dirname(__FILE__))
+  session = GoogleDrive::Session.from_config(confpath)
+
+  unless (workbook = session.file_by_title(docname))
+    raise "File #{docname} not found!"
+  end
+
+  worksheets = workbook.worksheets.dup
 end
 
+factory = FacadeFactory.new(workbook)
 cards = {}
 defaultFile = nil
-worksheets = file.worksheets.dup
 
 if (options['sheets'])
-  worksheets.select! { |sheet| options['sheets'].include?(sheet.title) }
+  worksheets.select! { |sheet| 
+    title = factory.create(sheet).getTitle()
+    options['sheets'].include?(title)
+  }
 end
 
 if (options['gen-default'])
@@ -32,6 +47,8 @@ if (options['gen-default'])
 end
 
 worksheets.each do |ws|
+  ws = factory.create(ws)
+
   cards = cards.merge(symbol_replace(read_worksheet(ws, defaultFile), options))
 end
 

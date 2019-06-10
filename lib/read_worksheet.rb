@@ -5,26 +5,27 @@
 def read_worksheet(ws, defaultFile)
   cards = {}
   keys = []
-  (1..ws.num_rows).each do |row|
+  (1..ws.getNumRows()).each do |row|
     if (row == 1)
-      cards[ws.title] = {}
+      cards[ws.getTitle()] = {}
     end
 
     card = {}
 
-    (1..ws.num_cols).each do |col|
-      if ws[row, col].empty? then next end
+    (1..ws.getNumCols()).each do |col|
+      cell = ws.getCell(row, col)
+      if cell.empty? then next end
 
       # first row should be keys
       if (row == 1)
-        keys << ws[row, col].gsub(' ', '_').downcase
+        keys << cell.gsub(' ', '_').downcase
       else
-        card[keys[col-1]] = ws[row, col]
+        card[keys[col-1]] = cell
       end
     end
 
     unless (card.empty?)
-      cards[ws.title][card['name']] = card
+      cards[ws.getTitle()][card['name']] = card
     end
 
     if (defaultFile and card['count'])
