@@ -42,7 +42,9 @@ GEM
     mini_portile2 (2.4.0)
     multi_json (1.13.1)
     multipart-post (2.0.0)
-    nokogiri (1.10.1-x64-mingw32)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
+    nokogiri (1.10.10-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     os (0.9.6)
     public_suffix (3.0.1)
@@ -78,6 +80,7 @@ GEM
     uber (0.1.0)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
