@@ -1,8 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.5.2)
-      public_suffix (>= 2.0.2, < 4.0)
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     combine_pdf (1.0.8)
       ruby-rc4 (>= 0.1.5)
     declarative (0.0.10)
@@ -42,10 +42,12 @@ GEM
     mini_portile2 (2.4.0)
     multi_json (1.13.1)
     multipart-post (2.0.0)
+    nokogiri (1.10.1)
+      mini_portile2 (~> 2.4.0)
     nokogiri (1.10.1-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     os (0.9.6)
-    public_suffix (3.0.1)
+    public_suffix (4.0.6)
     representable (3.0.4)
       declarative (< 0.1.0)
       declarative-option (< 0.2.0)
@@ -78,6 +80,7 @@ GEM
     uber (0.1.0)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
