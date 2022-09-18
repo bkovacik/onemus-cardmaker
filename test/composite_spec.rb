@@ -80,13 +80,10 @@ describe 'image rotates' do
     end
 
     def render_card(card)
-      c = Image.new(
-        @cardX,
-        @cardY
-      ) {
-        self.background_color = 'transparent'
-        self.format = 'png'
-      }
+      c = Image.new(@cardX, @cardY) do |image|
+        image.background_color = 'transparent'
+        image.format = 'png'
+      end
 
       draw!(c, card)
 

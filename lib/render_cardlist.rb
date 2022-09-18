@@ -88,10 +88,10 @@ class CardListRenderer
       cardY = @cardY
       padding = @padding
 
-      output = imageList.montage{
-        self.geometry = "#{cardX}x#{cardY}#{padding}"
-        self.tile = tile
-      }
+      output = imageList.montage do |list|
+        list.geometry = "#{cardX}x#{cardY}#{padding}"
+        list.tile = tile
+      end
       output.units = Magick::PixelsPerInchResolution
       output.x_resolution = @dpi
 

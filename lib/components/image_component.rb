@@ -17,15 +17,15 @@ class ImageComponent < BaseComponent
     temp = tile_crop_resize(temp, dpi)
 
     if (@field['color'])
-      background = Image.new(temp.columns, temp.rows) {
-        self.background_color = 'transparent'
-      }
+      background = Image.new(temp.columns, temp.rows) do |image|
+        image.background_color = 'transparent'
+      end
       temp_dr = create_new_drawing()
 
       temp_dr.rectangle(0, 0, temp.columns, temp.rows)
       temp_dr.draw(background)
 
-      background.composite!(temp, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
+      background.composite!(temp, Magick::CenterGravity, Magick::CopyAlphaCompositeOp)
 
       background.composite!(temp, Magick::CenterGravity, string_to_copyop(@field['combine']))
     else
@@ -88,11 +88,11 @@ class ImageComponent < BaseComponent
         end
       end
 
-      montage = tiledImage.montage() {
-        self.geometry = "#{tilex}x#{tiley}+0+0"
-        self.background_color = 'transparent'
-        self.tile = "#{timesX}x#{timesY}"
-      }
+      montage = tiledImage.montage() do |image|
+        image.geometry = "#{tilex}x#{tiley}+0+0"
+        image.background_color = 'transparent'
+        image.tile = "#{timesX}x#{timesY}"
+      end
       tiledImage.clear()
 
       return montage

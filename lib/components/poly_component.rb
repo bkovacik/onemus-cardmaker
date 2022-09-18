@@ -65,9 +65,9 @@ class PolyComponent < BaseComponent
     path << ' Z'
 
     d.path(path)
-    image = Image.new(dims[:width], dims[:height]) {
-      self.background_color = 'transparent'
-    }
+    image = Image.new(dims[:width], dims[:height]) do |image|
+      image.background_color = 'transparent'
+    end
     d.draw(image)
 
     return image

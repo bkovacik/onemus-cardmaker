@@ -22,10 +22,10 @@ class TextComponent < BaseComponent
     font = @fontDir +
       (@field['font'].nil? ? @font : @field['font']) +
       '.ttf'
-    unless File.file?(font)
-      raise "#{font} not found!"
-    else
+    if File.file?(font)
       d.font = font
+    else
+      p "#{font} not found! Using default instead."
     end
 
     il = ImageList.new
@@ -86,9 +86,9 @@ class TextComponent < BaseComponent
       tempimlist = ImageList.new
 
       unless (pad.zero?)
-        padimg = Image.new(pad, tempimg.rows) {
-          self.background_color = 'transparent'
-        }
+        padimg = Image.new(pad, tempimg.rows) do |image|
+          image.background_color = 'transparent'
+        end
         tempimlist << padimg
       end
 
@@ -219,9 +219,9 @@ class TextComponent < BaseComponent
             imageY += stroke*2*dpi
           end
 
-          im = Image.new(imageX, imageY) {
-            self.background_color = 'transparent'
-          }
+          im = Image.new(imageX, imageY) do |image|
+            image.background_color = 'transparent'
+          end
 
           dr = d.clone
           outline!(dr, im, dpi, item, 0, 0)

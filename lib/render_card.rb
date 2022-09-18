@@ -54,13 +54,10 @@ class CardRenderer
 
   # Takes in a hash representing a card and outputs an image to the outputs directory
   def render_card(card)
-    c = Image.new(
-      @cardX,
-      @cardY
-    ) {
-      self.background_color = 'transparent'
-      self.format = 'png'
-    }
+    c = Image.new(@cardX, @cardY) do |image|
+      image.background_color = 'transparent'
+      image.format = 'png'
+    end
 
     draw!(c, card)
 
@@ -295,9 +292,9 @@ class CardRenderer
       canvas = Image.new(
         image.columns + (transposeX.abs + blur*2)*@dpi,
         image.rows + (transposeY.abs + blur*2)*@dpi,
-      ) {
-        self.background_color = 'transparent'
-      }
+      ) do |image|
+        image.background_color = 'transparent'
+      end
 
       # Blur if transpose > blur, tranpose otherwise
       imageTransposeX = [[blur - transposeX, transposeX].max, blur].min
