@@ -5,3 +5,4 @@ config.json
 *.swp
 !*.gitkeep
 !config/onemus
+!config/config.json.base
