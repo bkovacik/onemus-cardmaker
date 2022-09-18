@@ -64,7 +64,6 @@ FIELDS = [
       'image' => 'base_image.png'
     }
   }
-
 ]
 
 describe 'image rotates' do

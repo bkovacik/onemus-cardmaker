@@ -75,10 +75,15 @@ class CardRenderer
     # Draws a card to image
     # Mutates image
     def draw!(image, card)
-      sortedKeys = @fields.keys.sort_by do |key|
-        @fields[key]['z-index'] = 0 unless @fields[key]['z-index']
+      noZIndexKeys, zIndexKeys = @fields.keys.partition do |key|
+        @fields[key]['z-index'].nil?
+      end
+
+      sortedKeys = zIndexKeys.sort_by do |key|
         @fields[key]['z-index']
       end
+
+      sortedKeys += noZIndexKeys
 
       sortedKeys.each do |name|
         field = @fields[name]
