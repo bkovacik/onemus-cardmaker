@@ -21,7 +21,7 @@ if (options['local'])
   worksheets = workbook.sheets
 else 
   confpath = File.expand_path('../config/config.json', File.dirname(__FILE__))
-  session = GoogleDrive::Session.from_credentials(confpath)
+  session = GoogleDrive::Session.from_service_account_key(confpath)
 
   unless (workbook = session.file_by_title(docname))
     raise "File #{docname} not found!"

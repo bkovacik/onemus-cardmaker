@@ -41,7 +41,7 @@ class CardRenderer
 
     @symbols = YAML.load_file(confdir + args['symbols'])['symbols']
     @statictext = YAML.load_file(confdir + args['statictext'])['texts']
-    @images = args['images']
+    @images = args['images'].chomp('/') + args['gamedir'] + '/'
 
     @outdir = args['outdir']
 
