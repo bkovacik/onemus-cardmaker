@@ -62,7 +62,7 @@ class ImageComponent < BaseComponent
         scale = scaleX
         scale = scaleY if scaleY > scaleX
 
-        image.resize!(image.columns*scale, image.rows*scale, Magick::CubicFilter, 0.7,)
+        image.resize!(image.columns*scale, image.rows*scale, Magick::LanczosFilter, 0.7)
       end
 
       image.crop!(Magick::CenterGravity, size['x'], size['y']) if (@field['crop'])
