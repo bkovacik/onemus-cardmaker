@@ -26,6 +26,7 @@ class CardRenderer
     @dpi = args['dpi'] ? args['dpi'] : layout['dpi']
 
     @fields = layout['fields']
+    @sortedKeys = get_sorted_keys_from_fields(@fields)
     @cardX = (layout['x'] * @dpi).floor
     @cardY = (layout['y'] * @dpi).floor
     @font = layout['font']
@@ -75,17 +76,7 @@ class CardRenderer
     # Draws a card to image
     # Mutates image
     def draw!(image, card)
-      noZIndexKeys, zIndexKeys = @fields.keys.partition do |key|
-        @fields[key]['z-index'].nil?
-      end
-
-      sortedKeys = zIndexKeys.sort_by do |key|
-        @fields[key]['z-index']
-      end
-
-      sortedKeys += noZIndexKeys
-
-      sortedKeys.each do |name|
+      @sortedKeys.each do |name|
         field = @fields[name]
 
         # defaults
@@ -351,5 +342,29 @@ class CardRenderer
       mask.composite!(temp_mask, Magick::CenterGravity, Magick::MultiplyCompositeOp)
 
       return image.composite!(mask, Magick::CenterGravity, Magick::CopyOpacityCompositeOp)
+    end
+
+    # Returns keys bucket sorted by z-index
+    def get_sorted_keys_from_fields(fields)
+      buckets = {}
+      fields.each do |key, value|
+        zIndex = value['z-index'] ? value['z-index'] : 0
+        if (!buckets.key?(zIndex))
+          buckets[zIndex] = []
+        end
+
+        buckets[zIndex].append(key)
+      end
+
+      sortedKeys = []
+      zIndices = buckets.keys.sort_by do |index|
+        index
+      end
+
+      zIndices.each do |index|
+        sortedKeys += buckets[index]
+      end
+
+      sortedKeys
     end
 end
