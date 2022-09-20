@@ -7,7 +7,9 @@ class RectangleComponent < BaseComponent
     image = Image.new(
       (@field['sizex']*dpi).floor,
       (@field['sizey']*dpi).floor
-    )
+    ) do |canvas|
+      canvas.background_color = 'transparent'
+    end
 
     draw_rectangle(dpi, d)
 
