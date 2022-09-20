@@ -3,6 +3,7 @@ images/*
 config/*
 config.json
 *.swp
+*.mk
 !*.gitkeep
 !config/onemus
 !config/config.json.base
