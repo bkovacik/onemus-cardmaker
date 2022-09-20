@@ -71,6 +71,7 @@ describe 'image rotates' do
     def initialize(args)
       @name = args['name']
       @fields = args['fields']
+      @sortedKeys = args['sortedKeys']
       @cardX = args['x']
       @cardY = args['y']
       @images = 'test/images/'
@@ -94,10 +95,11 @@ describe 'image rotates' do
     context field do
       it "renders the image" do
         generatedImagePixels = CardRenderer.new({
-          'fields'  => field,
-          'x'       => 3*DPI,
-          'y'       => 3*DPI,
-          'name'    => "composite_#{i}"
+          'fields'     => field,
+          'sortedKeys' => field.keys,
+          'x'          => 3*DPI,
+          'y'          => 3*DPI,
+          'name'       => "composite_#{i}"
         }).render_card({}).export_pixels_to_str
 
         testImagePixels = Image.read("./test/images/composite_#{i}.png").first.export_pixels_to_str
