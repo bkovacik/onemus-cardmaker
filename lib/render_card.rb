@@ -220,7 +220,7 @@ class CardRenderer
             next token
           end
 
-          floatToken = token.to_f rescue nil
+          floatToken = Float(token) rescue nil
 
           matches = /(\w+)\.(\w+)/.match(token).captures
 

@@ -81,6 +81,7 @@ class TextComponent < BaseComponent
           pad = 0
       end
       pad = pad.to_i
+      pad = [pad, 0].max
 
       tempimlist.destroy!
       tempimlist = ImageList.new
