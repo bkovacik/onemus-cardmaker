@@ -220,18 +220,14 @@ class CardRenderer
             next token
           end
 
-          floatToken = Float(token) rescue nil
-
           matches = /(\w+)\.(\w+)/.match(token).captures
 
           if (!matches.length)
             raise "Malformed token #{token}"
-          elsif (!floatToken.nil?)
-            floatToken
           elsif (@drawHash.has_key?(matches[0]))
             @drawHash[matches[0]][matches[1].to_sym]
           else
-            matches[0]
+            Float(token) rescue token
           end
         end
 
