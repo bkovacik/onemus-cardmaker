@@ -215,7 +215,8 @@ class CardRenderer
       if (field.is_a?(Numeric))
         return field
       else
-        operatorMatch = /([*+\/\-])/
+        # < = min, > = max
+        operatorMatch = /([*+\/\-<>])/
         resolvedTokens = field.split(operatorMatch).map do |token|
           if (token =~ operatorMatch)
             next token
@@ -232,22 +233,22 @@ class CardRenderer
           end
         end
 
-        additionTokens = []
+        operationTokens = []
         tempTokens = []
         resolvedTokens.each do |token|
-          if (token =~ /[+\-]/)
-            additionTokens << do_operation(tempTokens)
+          if (token =~ /[+\-<>]/)
+            operationTokens << do_operation(tempTokens)
             tempTokens = []
 
-            additionTokens << token
+            operationTokens << token
           else
             tempTokens << token
           end
         end
 
-        additionTokens += tempTokens
+        operationTokens += tempTokens
 
-        return do_operation(additionTokens)
+        return do_operation(operationTokens)
       end
     end
 
@@ -260,9 +261,18 @@ class CardRenderer
       end
 
       result = opArray.shift
-
+      prevOp = result
       opArray.each_slice(2) do |a, b|
-        result = result.send(a, b)
+        if (a == '<')
+          result -= prevOp
+          result += [prevOp, b].min
+        elsif (a == '>')
+          result -= prevOp
+          result += [prevOp, b].max
+        else
+          result = result.send(a, b)
+          prevOp = 0.send(a, b)
+        end
       end
 
       return result
