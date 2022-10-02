@@ -40,6 +40,7 @@ class TextComponent < BaseComponent
     height = d.get_type_metrics('.').height
 
     textlength = 0
+    maxNewLines = 1
 
     # Normalize textstring and get resulting width
     text.each_with_index do |item, i|
@@ -50,12 +51,16 @@ class TextComponent < BaseComponent
         textlength += item.columns
       else
         textlength += d.get_type_metrics(item).width
+        maxNewLines = [maxNewLines, item.count("\n")+1].max
       end
     end
 
+    height *= maxNewLines
     scale = @field['sizey'] ?
       (@field['sizex']*@field['sizey']*dpi**2)/height/textlength : 1
     scale = [scale, 1].min
+    # Subtract a magic number to correct for our (over)estimation
+    scale = Math.sqrt(scale)-0.04
 
     d.pointsize = fontsize*scale
     d.gravity = Magick::SouthWestGravity

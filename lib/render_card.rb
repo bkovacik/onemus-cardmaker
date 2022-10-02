@@ -189,11 +189,12 @@ class CardRenderer
       to_position = drop_shadow(field, to_position) if (field['dropshadow'])
 
       bbox_a = [to_position.columns, to_position.rows]
+      rows = field['sizey'] ? field['sizey'] : to_position.rows.to_f/@dpi
       @drawHash[name] = SizeStruct.new(
         resolve_field(field['x']),
         resolve_field(field['y']),
         to_position.columns.to_f/@dpi,
-        to_position.rows.to_f/@dpi,
+        rows,
       )
 
       r = Math.sin(45*Math::PI/180)*bbox_a.min
