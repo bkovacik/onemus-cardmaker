@@ -89,3 +89,24 @@ You can set `SSL_CERT_FILE` to the cert.pem found in msys/usr/ssl and `SSL_CERT_
 `y` - Y position of the component
 
 `z-index` - Stacking order of the field
+
+## Arithmetic Operators
+
+The cardmaker supports simple arithmetic with `+`, `-`, min (annotated as `<`), and max (annotated as `>`).
+
+Order of operations works as normal for + and -, but the `<` and `>` operators take precedence.
+
+### Ex:
+```3+4=7```
+
+### Ex2:
+```
+3+4<3+5=12
+# 4<3 is calculated first (max of 4 and 3), then the rest of the arithmetic is performed
+```
+
+### Ex3:
+```
+field1.x+field1.sizex
+# Common usage
+```
