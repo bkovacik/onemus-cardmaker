@@ -60,7 +60,7 @@ class TextComponent < BaseComponent
       (@field['sizex']*@field['sizey']*dpi**2)/height/textlength : 1
     scale = [scale, 1].min
     # Subtract a magic number to correct for our (over)estimation
-    scale = Math.sqrt(scale)-0.04
+    scale = [Math.sqrt(scale)-0.04, 0.01].max
 
     d.pointsize = fontsize*scale
     d.gravity = Magick::SouthWestGravity
